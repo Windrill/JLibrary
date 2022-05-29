@@ -8,3 +8,10 @@ separate math library that includes matrix expressions
 
 
 // syn: testing syntax
+
+
+How to clone locally:
+git clone ~/JS/graphing/src/JLibrary/
+git remote get-url --all origin
+
+lol every repository will have write access, so just be aware
