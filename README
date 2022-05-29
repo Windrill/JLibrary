@@ -15,3 +15,4 @@ git clone ~/JS/graphing/src/JLibrary/
 git remote get-url --all origin
 
 lol every repository will have write access, so just be aware
+but seems like 'remote' which git stores a reference to is uniquely in the directory ~/JS/graphing/src/JLibrary/
