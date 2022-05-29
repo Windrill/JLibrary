@@ -1,0 +1,10 @@
+Style
+// D_ data structure
+// R_ draw calls related (render)
+// files are lowercase, classes and funcctions, types are upper
+
+math.min.js:
+separate math library that includes matrix expressions
+
+
+// syn: testing syntax
