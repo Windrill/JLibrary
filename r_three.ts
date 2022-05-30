@@ -1,12 +1,13 @@
-/*
+import * as THREE from 'three'
+// requires THREE's type bindings
 class utils {
-  static getSphere(r) {
+  static getSphere(r : number) {
     let geometry = new THREE.SphereGeometry(r, 24, 24);
     let material = new THREE.MeshBasicMaterial({color: 'rgb(255,255,255)'});
     return new THREE.Mesh(geometry, material);
   }
 
-  static getBox(w, h, d) {
+  static getBox(w : number, h : number, d : number) {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshPhongMaterial({color: 'rgb(120,120,120)'});
     let mesh = new THREE.Mesh(geometry, material);
@@ -15,7 +16,7 @@ class utils {
   }
 
   // unpack (vector) point from object
-  static oup(o) {
+  static oup(o : THREE.Vector3) {
     return [o.x, o.y, o.z];
   }
 
@@ -198,7 +199,7 @@ class CLine {
   }
 }
 
-*/
-export {
 
+export {
+  utils
 }
