@@ -1,1 +1,0 @@
-// wrap console.log

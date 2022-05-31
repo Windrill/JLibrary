@@ -1,13 +1,15 @@
 import * as THREE from 'three'
-// requires THREE's type bindings
+import {D_Point, OneDArray} from "./functions/structures";
+// Requires THREE's type bindings
+// C3....
 class utils {
-  static getSphere(r : number) {
+  static getSphere(r: number) {
     let geometry = new THREE.SphereGeometry(r, 24, 24);
     let material = new THREE.MeshBasicMaterial({color: 'rgb(255,255,255)'});
     return new THREE.Mesh(geometry, material);
   }
 
-  static getBox(w : number, h : number, d : number) {
+  static getBox(w: number, h: number, d: number) {
     let geometry = new THREE.BoxGeometry(w, h, d);
     let material = new THREE.MeshPhongMaterial({color: 'rgb(120,120,120)'});
     let mesh = new THREE.Mesh(geometry, material);
@@ -16,16 +18,16 @@ class utils {
   }
 
   // unpack (vector) point from object
-  static oup(o : THREE.Vector3) {
+  static oup(o: THREE.Vector3) {
     return [o.x, o.y, o.z];
   }
 
   // make a vector
-  static av(arr) {
+  static av(arr : OneDArray) {
     return {x: arr[0], y: arr[1]};
   };
 
-  static uv(o) {
+  static uv(o : D_Point) {
     return [o.x, o.y];
   }
 
@@ -174,7 +176,7 @@ class utils {
   }
 }
 
-class CLine {
+class C3Line {
   material;
   points: THREE.Vector2[];
   geometry: THREE.BufferGeometry;
@@ -188,7 +190,7 @@ class CLine {
 
   }
 
-  set(x, y) {
+  set(x: THREE.Vector2, y: THREE.Vector2) {
     this.points = [x, y];
     this.geometry.setFromPoints(this.points);
     this.line.geometry = this.geometry;
@@ -201,5 +203,6 @@ class CLine {
 
 
 export {
-  utils
+  utils,
+  C3Line
 }

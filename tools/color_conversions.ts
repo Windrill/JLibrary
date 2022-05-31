@@ -7,14 +7,13 @@ function hsl2rgb(h: number, s: number, l: number)
 }   
 
 // in: r,g,b in [0,1], out: h in [0,360) and s,v in [0,1]
-function rgb2hsl(r: number, g: number, b: number)
-{
+function rgb2hsl(r: number, g: number, b: number) {
   let a=Math.max(r,g,b), n=a-Math.min(r,g,b), f=(1-Math.abs(a+a-n-1)); 
   let h= n && ((a==r) ? (g-b)/n : ((a==g) ? 2+(b-r)/n : 4+(r-g)/n)); 
   return [60*(h<0?h+6:h), f ? n/f : 0, (a+a-n)/2];
 } 
 
-function hexToRgb(c: string){
+function hexToRgb(c: string) {
   c = c.substring(1);      // strip #
   let rgb = parseInt(c, 16);   // convert rrggbb to decimal
   let r = (rgb >> 16) & 0xff;  // extract red

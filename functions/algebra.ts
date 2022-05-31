@@ -1,4 +1,4 @@
-import {D_Point, NDArray, OneDArray} from "../structures";
+import {D_Point, NDArray, OneDArray} from "./structures";
 
 
 class Algebra {
@@ -122,10 +122,32 @@ function SYN_GetMethods(obj: { [x: string]: { toString: () => string; }; }) {
   return result;
 }
 
+function CLAMP(num : number, low : number | null, high : number | null) {
+  if (low !== null && num < low) {
+    return low;
+  }
+  if (high !== null && num > high) {
+    return high;
+  }
+  return num;
+}
+
+function WRAP(num : number, low : number | null, high : number | null) {
+  if (low !== null && num < low) {
+    return high;
+  }
+  if (high !== null && num > high) {
+    return low;
+  }
+  return num;
+}
 export {
   Algebra,
 }
 export {
+  CLAMP,
+  WRAP,
+
   C_DIST,
   C_DOT,
   C_CROSS,

@@ -1,7 +1,13 @@
 Style
-// D_ data structure
+// D_ data structure (data only)
 // R_ draw calls related (render)
+C_ <-- my structures, mostly drawing material
+C3_ <-- drawing material using THREE.JS
 // files are lowercase, classes and funcctions, types are upper
+
+
+Typescript Indexer (for convenience)
+  [index: string]: any;
 
 math.min.js:
 separate math library that includes matrix expressions
@@ -16,3 +22,42 @@ git remote get-url --all origin
 
 lol every repository will have write access, so just be aware
 but seems like 'remote' which git stores a reference to is uniquely in the directory ~/JS/graphing/src/JLibrary/
+
+
+Meeting errors?
+
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 428 bytes | 428.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0)
+remote: error: refusing to update checked out branch: refs/heads/master
+remote: error: By default, updating the current branch in a non-bare repository
+remote: is denied, because it will make the index and work tree inconsistent
+remote: with what you pushed, and will require 'git reset --hard' to match
+remote: the work tree to HEAD.
+remote: 
+remote: You can set the 'receive.denyCurrentBranch' configuration variable
+remote: to 'ignore' or 'warn' in the remote repository to allow pushing into
+remote: its current branch; however, this is not recommended unless you
+remote: arranged to update its work tree to match what you pushed in some
+remote: other way.
+remote: 
+remote: To squelch this message and still keep the default behaviour, set
+remote: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
+To /home/windrill/JS/graphing/src/JLibrary/
+ ! [remote rejected] master -> master (branch is currently checked out)
+
+- it meant /home/windrill/JS/graphing/src/JLibrary was checkouted in branch master. Seems that they were able to tell. Not sure how bitbucket does it.
+From source I checked out 'develop' branch (just temporary) and pushed again. Now it works
+
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 428 bytes | 428.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0)
+To /home/windrill/JS/graphing/src/JLibrary/
+   85573c9..9d717a2  master -> master
+

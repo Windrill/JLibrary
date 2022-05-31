@@ -38,7 +38,7 @@ class D_Rect {
   }
 }
 // convert d_rect into multidimensional array accessible.....
-
+// D: Data only
 // Constant types
 interface D_Point {
   x: number;

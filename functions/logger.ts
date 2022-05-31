@@ -1,0 +1,5 @@
+// wrap console.log
+
+export {
+
+}

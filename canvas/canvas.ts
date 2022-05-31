@@ -1,5 +1,5 @@
-import {D_Point, D_Rect, NDArray, OneDArray} from "../structures";
-import {Algebra} from "./algebra";
+import {D_Point, D_Rect, NDArray, OneDArray} from "../functions/structures";
+import {Algebra} from "../functions/algebra";
 
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
