@@ -57,7 +57,7 @@ class R_Canvas {
   }
 
   clear(rect: D_Rect) {
-    (this.ctx).clearRect(rect.x, rect.y, rect.w, rect.h);
+    (this.ctx).clearRect(rect.x, rect.y, rect.width, rect.height);
   }
 
   // spacing is to the left bottom direction
@@ -71,8 +71,8 @@ class R_Canvas {
     // this.ctx.fillRect(0, 0, width, height);
     this.ctx.font = '14px serif';
     this.ctx.fillStyle = "#000000";
-    this.cline(drawRect.x - spacing, drawRect.y, drawRect.x + drawRect.w - spacing, drawRect.y);
-    this.cline(drawRect.x, drawRect.y - spacing, drawRect.x, drawRect.y + drawRect.h - spacing);
+    this.cline(drawRect.x - spacing, drawRect.y, drawRect.x + drawRect.width - spacing, drawRect.y);
+    this.cline(drawRect.x, drawRect.y - spacing, drawRect.x, drawRect.y + drawRect.height - spacing);
     // TODO: Add axis labels
     /*
     | <-- line:
@@ -86,7 +86,7 @@ class R_Canvas {
      */
 
     // X Axis
-    for (let i = drawRect.x; i <= drawRect.x + drawRect.w; i += 40) {
+    for (let i = drawRect.x; i <= drawRect.x + drawRect.width; i += 40) {
       // this.cline(i, 5, i, 10);
       this.cline(
         i, drawRect.y,
@@ -104,7 +104,7 @@ class R_Canvas {
       // this.ctx.fillText(String(i-drawRect.x), i - spacing, drawRect.y - 23);
     }
 
-    for (let i = drawRect.y; i <= drawRect.y + drawRect.h; i += 40) {
+    for (let i = drawRect.y; i <= drawRect.y + drawRect.height; i += 40) {
       // y axis
       this.cline(drawRect.x, i, drawRect.x - spacing / 2, i);
       // this.ctx.fillText(String(i-drawRect.y), drawRect.x - 32, i + 5);

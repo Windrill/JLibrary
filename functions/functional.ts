@@ -51,22 +51,25 @@ function ArrayClone(arr: any[]) {
   return ret;
 }
 
-// Just runs this once or multiple times based on 'array-like' status
-// Runs function on this object, or on each element of the array
-function Composite(obj : any | any[], func : (obj: any)=>any) {
+// Intention: runs this once or multiple times based on 'array-like' status (on this object, or on each element of the array)
+// Issue: Cannot differentiate using '.length', because Vector2 in three.js has length overridden which means magnitude
+function CompositeFunc(obj : any | any[], func : (obj: any)=>any) {
   if (obj.length) {
     for (let i=0;i<obj.length;i++) {
       func(obj[i]);
     }
+  } else {
+    func(obj);
   }
 }
+
 export {
   ForEachArrayIndex,
   ForEachArrayItem,
   ForEachObjectItem,
 
   Accumulator,
-  Composite
+  CompositeFunc
 }
 
 export {

@@ -1,5 +1,12 @@
 import * as THREE from 'three'
 import {D_Point, OneDArray} from "./functions/structures";
+import {Vector2, Vector3} from "three";
+// Also you might want some common variables
+const ORG2 = new Vector2(0,0,0);
+const UP2 = new Vector2(0,1,0);
+
+const ORG = new Vector3(0,0,0);
+const UP = new Vector3(0,1,0);
 // Requires THREE's type bindings
 // C3....
 class utils {
@@ -205,4 +212,12 @@ class C3Line {
 export {
   utils,
   C3Line
+}
+export {
+  ORG2,
+  UP2,
+
+  ORG,
+  UP,
+
 }

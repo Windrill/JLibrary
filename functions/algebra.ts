@@ -89,6 +89,14 @@ const C_OBJ_ELEMENT_MINUS = (a: D_Point, b: D_Point) => {
   return {x: a.x - b.x, y: a.y - b.y};
 }
 
+function C_ARRAY_COPY(a: any[]) : any[]{
+  let res = [];
+  for (let i=0;i<a.length;i++) {
+    res.push(a[i]);
+  }
+  return res;
+}
+
 function C_ARRAY_ELEMENT_ADD(a: any[], b: any[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] += b[i];
@@ -132,12 +140,12 @@ function CLAMP(num : number, low : number | null, high : number | null) {
   return num;
 }
 
-function WRAP(num : number, low : number | null, high : number | null) {
-  if (low !== null && num < low) {
-    return high;
+function WRAP(num : number, low : number, high : number) {
+  if (num < low) {
+    return high - (low-num);
   }
-  if (high !== null && num > high) {
-    return low;
+  if (num > high) {
+    return low + (num-high);
   }
   return num;
 }
@@ -151,6 +159,8 @@ export {
   C_DIST,
   C_DOT,
   C_CROSS,
+
+  C_ARRAY_COPY,
   C_OBJ_ELEMENT_MINUS,
   C_ARRAY_ELEMENT_ADD,
   C_ARRAY_ELEMENT_MULT,
