@@ -1,5 +1,6 @@
-import {D_Point, D_Rect, NDArray, OneDArray} from "../functions/structures";
+import {D_Point, D_Rect, NDArray, NormalizePoint} from "../functions/structures";
 import {Algebra} from "../functions/algebra";
+import {DEG2RAD} from "three/src/math/MathUtils";
 
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
@@ -9,6 +10,30 @@ class R_Canvas {
   }
 
   destructor() {
+
+  }
+
+  carrow(point: D_Point, direction: D_Point, magnitude: number) {
+    // let normPoint = NormalizePoint(point);
+    let normDirection = NormalizePoint(direction);
+    let endOfLine = {
+      x: point.x + normDirection.x * magnitude,
+      y: point.y + normDirection.y * magnitude
+    };
+    this.cline(point.x, point.y, endOfLine.x, endOfLine.y,
+      {fillStyle: "#126cb4", debug: false, lineWidth: 2});
+    let arrowFlapFromTrunk = magnitude / 5;
+
+    // let flapHorizontalLength = Math.tan(DEG2RAD * 40) * arrowFlapFromTrunk;
+    // how to draw this line perpendicular from the main line
+    let topFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, 40);
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y,
+      {fillStyle: "#126cb4", debug: false, lineWidth: 2});
+
+
+    let botFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - botFlap.x, endOfLine.y - botFlap.y,
+      {fillStyle: "#126cb4", debug: true, lineWidth: 3});
 
   }
 
@@ -39,11 +64,19 @@ class R_Canvas {
     this.ctx.closePath();
   }
 
-  cline(a: number, b: number, x: number, y: number, {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
+  // TODO: Organize styles and document, fix it such that these options are optional
+  cline(a: number, b: number, x: number, y: number, {fillStyle, debug, lineWidth} = {
+    fillStyle: "#000000",
+    debug: false,
+    lineWidth: 1
+  }) {
     if (debug) {
       console.log(`${a},${b} to ${x},${y}`);
     }
+    this.ctx.lineWidth = lineWidth;
     this.ctx.fillStyle = fillStyle;
+    // TODO, make more proper
+    this.ctx.strokeStyle = fillStyle;
     this.ctx.beginPath();
     this.ctx.moveTo(a, b);
     this.ctx.lineTo(x, y);

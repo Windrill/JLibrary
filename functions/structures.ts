@@ -110,6 +110,13 @@ interface D_Point {
   y: number;
 }
 
+function NormalizePoint (p : D_Point) {
+  let mag = Math.sqrt(p.x*p.x + p.y*p.y);
+  return {
+    x: p.x/mag,
+    y: p.y/mag
+  }
+}
 // Also properties
 type OneDArray = number[];
 type NDArray = number[][];
@@ -142,5 +149,6 @@ export type {
 
 export {
   multiDimensional,
-  singleDimensional
+  singleDimensional,
+  NormalizePoint
 }

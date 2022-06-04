@@ -1,7 +1,24 @@
 import {D_Point, NDArray, OneDArray} from "./structures";
 
+//https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
+const DEG2RAD = Math.PI / 180;
+const RAD2DEG = 180 / Math.PI;
+
+function Polar2Cartesian(r: number, theta: number) {
+  return {
+    x: r * Math.cos(theta),
+    y: r * Math.sin(theta)
+  }
+}
 
 class Algebra {
+  static ProjectP(baseLineVector: D_Point, magnitude: number, projectAngle: number) {
+    // baseLine's radian angle + projectAngle's radian angle --> new angle --> convert to cartesian
+    let twoFrameAngle = Math.atan2(baseLineVector.y, baseLineVector.x) + DEG2RAD * (projectAngle);
+    return Polar2Cartesian(magnitude, twoFrameAngle);
+  }
+
+
 // hopefully each x has a 'from, to'....like, plz have only 2 indices []
   /**
    * Each index = 1 dimension, locationRange & projectedRange is 1 array to 1 element in location array
@@ -89,9 +106,9 @@ const C_OBJ_ELEMENT_MINUS = (a: D_Point, b: D_Point) => {
   return {x: a.x - b.x, y: a.y - b.y};
 }
 
-function C_ARRAY_COPY(a: any[]) : any[]{
+function C_ARRAY_COPY(a: any[]): any[] {
   let res = [];
-  for (let i=0;i<a.length;i++) {
+  for (let i = 0; i < a.length; i++) {
     res.push(a[i]);
   }
   return res;
@@ -130,7 +147,7 @@ function SYN_GetMethods(obj: { [x: string]: { toString: () => string; }; }) {
   return result;
 }
 
-function CLAMP(num : number, low : number | null, high : number | null) {
+function CLAMP(num: number, low: number | null, high: number | null) {
   if (low !== null && num < low) {
     return low;
   }
@@ -140,15 +157,16 @@ function CLAMP(num : number, low : number | null, high : number | null) {
   return num;
 }
 
-function WRAP(num : number, low : number, high : number) {
+function WRAP(num: number, low: number, high: number) {
   if (num < low) {
-    return high - (low-num);
+    return high - (low - num);
   }
   if (num > high) {
-    return low + (num-high);
+    return low + (num - high);
   }
   return num;
 }
+
 export {
   Algebra,
 }
