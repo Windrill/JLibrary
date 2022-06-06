@@ -208,6 +208,11 @@ class C3Line {
   }
 }
 
+let CLAMP_VEC2 = (force : THREE.Vector2, maxForce : number) : void => {
+  if (force.length() > maxForce) {
+    force.setLength(maxForce);
+  }
+};
 
 export {
   utils,
@@ -220,4 +225,5 @@ export {
   ORG,
   UP,
 
+  CLAMP_VEC2
 }

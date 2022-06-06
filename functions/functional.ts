@@ -27,7 +27,7 @@ function ForEachObjectItem(func: any, object: { }) {
 }
 
 
-function Accumulator(func: any, array: any[], acc = 0): any {
+function Accumulator(func: any, array: any[], acc : any = 0): any {
   for (let i = 0; i < array.length; i++) {
     acc = func(acc, array[i]);
   }

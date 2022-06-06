@@ -13,7 +13,8 @@ class R_Canvas {
 
   }
 
-  carrow(point: D_Point, direction: D_Point, magnitude: number) {
+  // pass down
+  carrow(point: D_Point, direction: D_Point, magnitude: number, ...Args : any) {
     // let normPoint = NormalizePoint(point);
     let normDirection = NormalizePoint(direction);
     let endOfLine = {
@@ -21,19 +22,25 @@ class R_Canvas {
       y: point.y + normDirection.y * magnitude
     };
     this.cline(point.x, point.y, endOfLine.x, endOfLine.y,
-      {fillStyle: "#126cb4", debug: false, lineWidth: 2});
+      Args[0]
+//{fillStyle: "#126cb4", debug: false, lineWidth: 2}
+      );
     let arrowFlapFromTrunk = magnitude / 5;
+
 
     // let flapHorizontalLength = Math.tan(DEG2RAD * 40) * arrowFlapFromTrunk;
     // how to draw this line perpendicular from the main line
     let topFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, 40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y,
-      {fillStyle: "#126cb4", debug: false, lineWidth: 2});
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, Args[0]
+      // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
+  );
 
 
     let botFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
     this.cline(endOfLine.x, endOfLine.y, endOfLine.x - botFlap.x, endOfLine.y - botFlap.y,
-      {fillStyle: "#126cb4", debug: true, lineWidth: 3});
+      Args[0]
+      // {fillStyle: "#126cb4", debug: true, lineWidth: 3}
+    );
 
   }
 
@@ -104,6 +111,7 @@ class R_Canvas {
     // this.ctx.fillRect(0, 0, width, height);
     this.ctx.font = '14px serif';
     this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
     this.cline(drawRect.x - spacing, drawRect.y, drawRect.x + drawRect.width - spacing, drawRect.y);
     this.cline(drawRect.x, drawRect.y - spacing, drawRect.x, drawRect.y + drawRect.height - spacing);
     // TODO: Add axis labels

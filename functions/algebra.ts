@@ -118,18 +118,21 @@ function C_ARRAY_ELEMENT_ADD(a: any[], b: any[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] += b[i];
   }
+  return a;
 }
 
 function C_ARRAY_ELEMENT_MULT(a: any[], b: any[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] *= b[i];
   }
+  return a;
 }
 
 function C_ARRAY_ELEMENT_SCALE(a: any[], b: number) {
   for (let i = 0; i < a.length; i++) {
     a[i] *= b;
   }
+  return a;
 }
 
 function SYN_GetMethods(obj: { [x: string]: { toString: () => string; }; }) {

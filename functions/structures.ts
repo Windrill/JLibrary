@@ -24,8 +24,9 @@ import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_MULT, C_ARRAY_ELEMENT
  * @constructor
  */
 // haven't used before, lol, looks very eveil
+// 100,100,20,20 --> 80,80? or should have been 90,90-110,110?
 function MidPointToTopLeft(...args : number[]) {
-  let halfLength = args.length;
+  let halfLength = args.length/2;
   let secondHalf = C_ARRAY_COPY(args);
   secondHalf.splice(halfLength);
   C_ARRAY_ELEMENT_SCALE(secondHalf, -1);
@@ -35,6 +36,23 @@ function MidPointToTopLeft(...args : number[]) {
   addedReturns.splice(halfLength);
   // copiedPoints.spli
   return addedReturns;
+}
+
+function MidPointToD_Rect(...args : number[]) {
+  let halfLength = args.length/2;
+  let d_rect_params = [];
+  for (let i=0;i<halfLength;i++) {
+    d_rect_params.push(
+      args[i] - args[halfLength+i]/2
+    );
+  }
+
+  for (let i=0;i<halfLength;i++) {
+    d_rect_params.push(
+      args[i] + args[halfLength+i]/2
+    );
+  }
+  return new D_Rect(...d_rect_params);
 }
 
 class D_Rect {
@@ -110,6 +128,20 @@ interface D_Point {
   y: number;
 }
 
+// normalize as an array
+function NormalizeX(...args : number[]) : number[] {
+  let mag = 0;
+  for (let i=0;i<args.length;i++) {
+    mag += args[i]*args[i];
+  }
+  mag = Math.sqrt(mag);
+  let ret = [];
+  for (let i=0;i<args.length;i++) {
+    ret.push(args[i]/mag);
+  }
+  return ret;
+}
+
 function NormalizePoint (p : D_Point) {
   let mag = Math.sqrt(p.x*p.x + p.y*p.y);
   return {
@@ -151,4 +183,7 @@ export {
   multiDimensional,
   singleDimensional,
   NormalizePoint
+  ,
+  NormalizeX,
+  MidPointToD_Rect,
 }
