@@ -36,8 +36,8 @@ class R_Canvas {
   );
 
 
-    let botFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - botFlap.x, endOfLine.y - botFlap.y,
+    let bottomFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y,
       Args[0]
       // {fillStyle: "#126cb4", debug: true, lineWidth: 3}
     );
