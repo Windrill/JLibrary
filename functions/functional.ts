@@ -22,10 +22,13 @@ function ForEachArrayItem(func: any, array: any[]) {
   }
 }
 
-function ForEachObjectItem(func: any, object: { }) {
+function ForEachObjectKey(func: any, object: { }) {
   ForEachArrayItem(func, Object.keys(object));
 }
 
+const FUNCAccumulatorSum = (acc : number, numberAtI : number) => {
+  return acc + numberAtI;
+};
 
 function Accumulator(func: any, array: any[], acc : any = 0): any {
   for (let i = 0; i < array.length; i++) {
@@ -62,11 +65,14 @@ function CompositeFunc(obj : any | any[], func : (obj: any)=>any) {
     func(obj);
   }
 }
+export {
+  FUNCAccumulatorSum
+}
 
 export {
   ForEachArrayIndex,
   ForEachArrayItem,
-  ForEachObjectItem,
+  ForEachObjectKey,
 
   Accumulator,
   CompositeFunc

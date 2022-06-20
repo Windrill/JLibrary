@@ -1,3 +1,5 @@
+import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SCALE} from "./algebra";
+
 /*
 converts
        h
@@ -14,10 +16,6 @@ converts
  |          | |
  |----------| v
  */
-
-import {ForEachArrayItem} from "./functional";
-import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_MULT, C_ARRAY_ELEMENT_SCALE} from "./algebra";
-
 /**
  * Expects the first half of parameters to be specifying the midpoint, and the second half specifying the size
  * @param args
@@ -25,8 +23,8 @@ import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_MULT, C_ARRAY_ELEMENT
  */
 // haven't used before, lol, looks very eveil
 // 100,100,20,20 --> 80,80? or should have been 90,90-110,110?
-function MidPointToTopLeft(...args : number[]) {
-  let halfLength = args.length/2;
+function MidPointToTopLeft(...args: number[]) {
+  let halfLength = args.length / 2;
   let secondHalf = C_ARRAY_COPY(args);
   secondHalf.splice(halfLength);
   C_ARRAY_ELEMENT_SCALE(secondHalf, -1);
@@ -38,18 +36,18 @@ function MidPointToTopLeft(...args : number[]) {
   return addedReturns;
 }
 
-function MidPointToD_Rect(...args : number[]) {
-  let halfLength = args.length/2;
+function MidPointToD_Rect(...args: number[]) {
+  let halfLength = args.length / 2;
   let d_rect_params = [];
-  for (let i=0;i<halfLength;i++) {
+  for (let i = 0; i < halfLength; i++) {
     d_rect_params.push(
-      args[i] - args[halfLength+i]/2
+      args[i] - args[halfLength + i] / 2
     );
   }
 
-  for (let i=0;i<halfLength;i++) {
+  for (let i = 0; i < halfLength; i++) {
     d_rect_params.push(
-      args[i] + args[halfLength+i]/2
+      args[i] + args[halfLength + i] / 2
     );
   }
   return new D_Rect(...d_rect_params);
@@ -129,32 +127,42 @@ interface D_Point {
 }
 
 // normalize as an array
-function NormalizeX(...args : number[]) : number[] {
+function NormalizeX(...args: number[]): number[] {
   let mag = 0;
-  for (let i=0;i<args.length;i++) {
-    mag += args[i]*args[i];
+  for (let i = 0; i < args.length; i++) {
+    mag += args[i] * args[i];
   }
   mag = Math.sqrt(mag);
   let ret = [];
-  for (let i=0;i<args.length;i++) {
-    ret.push(args[i]/mag);
+  for (let i = 0; i < args.length; i++) {
+    ret.push(args[i] / mag);
   }
   return ret;
 }
 
-function NormalizePoint (p : D_Point) {
-  let mag = Math.sqrt(p.x*p.x + p.y*p.y);
+function NormalizePoint(p: D_Point) {
+  let mag = Math.sqrt(p.x * p.x + p.y * p.y);
   return {
-    x: p.x/mag,
-    y: p.y/mag
+    x: p.x / mag,
+    y: p.y / mag
   }
 }
+
 // Also properties
 type OneDArray = number[];
 type NDArray = number[][];
 type DArray = OneDArray | NDArray;
 type ZeroOrOneD = number | OneDArray;
 
+// Number_Indexed
+interface NI_Object {
+  [index: number]: any
+}
+
+// String_Indexed
+interface SI_Object {
+  [index: string]: any
+}
 
 // Multidimensional lambda: If the first element seems to be have length attribute
 const multiDimensional = (x: any): x is NDArray => x.length && x[0].length;
@@ -176,7 +184,10 @@ export type {
   DArray,
 
   Pair,
-  NDPair
+  NDPair,
+
+  NI_Object,
+  SI_Object
 }
 
 export {
@@ -186,4 +197,8 @@ export {
   ,
   NormalizeX,
   MidPointToD_Rect,
+
+}
+export {
+  MidPointToTopLeft
 }

@@ -2,14 +2,19 @@ import * as THREE from 'three'
 import {D_Point, OneDArray} from "./functions/structures";
 import {Vector2, Vector3} from "three";
 // Also you might want some common variables
-const ORG2 = new Vector2(0,0,0);
-const UP2 = new Vector2(0,1,0);
+const ORG2 = new Vector2(0, 0, 0);
+const UP2 = new Vector2(0, 1, 0);
 
-const ORG = new Vector3(0,0,0);
-const UP = new Vector3(0,1,0);
-// Requires THREE's type bindings
-// C3....
+const ORG = new Vector3(0, 0, 0);
+const UP = new Vector3(0, 1, 0);
+
+
 class utils {
+  // can you do templating lol
+  static ArrayToVec3(point: OneDArray) {
+    return new THREE.Vector3(point[0], point[1], point[2]);
+  }
+
   static getSphere(r: number) {
     let geometry = new THREE.SphereGeometry(r, 24, 24);
     let material = new THREE.MeshBasicMaterial({color: 'rgb(255,255,255)'});
@@ -30,11 +35,11 @@ class utils {
   }
 
   // make a vector
-  static av(arr : OneDArray) {
+  static av(arr: OneDArray) {
     return {x: arr[0], y: arr[1]};
   };
 
-  static uv(o : D_Point) {
+  static uv(o: D_Point) {
     return [o.x, o.y];
   }
 
@@ -208,7 +213,7 @@ class C3Line {
   }
 }
 
-let CLAMP_VEC2 = (force : THREE.Vector2, maxForce : number) : void => {
+let CLAMP_VEC2 = (force: THREE.Vector2, maxForce: number): void => {
   if (force.length() > maxForce) {
     force.setLength(maxForce);
   }

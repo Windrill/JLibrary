@@ -1,9 +1,10 @@
 import {D_Point, D_Rect, NDArray, NormalizePoint} from "../functions/structures";
 import {Algebra} from "../functions/algebra";
-import {DEG2RAD} from "three/src/math/MathUtils";
 
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
+  // includes.....a .....
+  camera: any;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
@@ -12,6 +13,14 @@ class R_Canvas {
   destructor() {
 
   }
+
+  //easy projecct first x/z, y/z
+  // CameraProjection(point: D_Point) {
+    // takes in 3D dot, outputs 2D projection
+    // you wanted this to also support 3d scaling..............
+
+    // THREE.Matrix4();
+  // }
 
   // pass down
   carrow(point: D_Point, direction: D_Point, magnitude: number, ...Args : any) {
@@ -43,7 +52,7 @@ class R_Canvas {
     );
 
   }
-
+// , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
   cpoint(point: D_Point) {
     this.ctx.beginPath();
     this.ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
@@ -103,7 +112,7 @@ class R_Canvas {
   // spacing is to the left bottom direction
   // change to match relative axis!!!
   // boundary is drawsize..
-  drawBoard(drawRect: D_Rect, dimensionRestraints: NDArray, spacing: number, clear = true, fractional: number = 0) {
+  drawAxis(drawRect: D_Rect, dimensionRestraints: NDArray, spacing: number, clear = true, decimalPlaces: number = 0) {
     if (clear) {
       this.clear(drawRect);
     }
@@ -141,7 +150,7 @@ class R_Canvas {
       let dimensionVals = Algebra.Project([i, drawRect.y], drawRect.toArray(), dimensionRestraints, false);
       // hmmm, fail then fail all mechanism --> designate point of catch explicitly?
       if (!dimensionVals.length) return;
-      this.ctx.fillText(String(dimensionVals[0].toFixed(fractional)), i - spacing, drawRect.y - 23);
+      this.ctx.fillText(String(dimensionVals[0].toFixed(decimalPlaces)), i - spacing, drawRect.y - 23);
       // this.ctx.fillText(String(i-drawRect.x), i - spacing, drawRect.y - 23);
     }
 
@@ -151,7 +160,7 @@ class R_Canvas {
       // this.ctx.fillText(String(i-drawRect.y), drawRect.x - 32, i + 5);
 
       let dimensionVals = Algebra.Project([drawRect.x, i], drawRect.toArray(), dimensionRestraints, false);
-      this.ctx.fillText(String((dimensionVals[1]).toFixed(fractional)), drawRect.x - 32, i + 5);
+      this.ctx.fillText(String((dimensionVals[1]).toFixed(decimalPlaces)), drawRect.x - 32, i + 5);
     }
   }
 

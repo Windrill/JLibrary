@@ -62,6 +62,8 @@ let ColorConversions = {
   rgbToHex,
   cmyk2rgb,
   rgb2cmyk
+  ,
+  componentToHex
 }
 
 export {
