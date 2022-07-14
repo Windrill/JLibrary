@@ -118,12 +118,25 @@ class D_Rect {
   }
 }
 
-// convert d_rect into multidimensional array accessible.....
 // D: Data only
 // Constant types
-interface D_Point {
+class D_Point {
   x: number;
   y: number;
+  z: number;
+  zValid: boolean;
+  constructor(x : number, y : number, z: number|undefined=undefined) {
+    this.x = x;
+    this.y = y;
+    if (z) {
+      this.z = z;
+      this.zValid = true;
+    } else {
+      this.z = 0;
+      this.zValid = false;
+    }
+  }
+
 }
 
 // normalize as an array
@@ -177,7 +190,6 @@ export {
 
 }
 export type {
-  D_Point,
   ZeroOrOneD,
   OneDArray,
   NDArray,
@@ -191,6 +203,8 @@ export type {
 }
 
 export {
+  D_Point,
+
   multiDimensional,
   singleDimensional,
   NormalizePoint

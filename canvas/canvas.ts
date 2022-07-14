@@ -3,8 +3,6 @@ import {Algebra} from "../functions/algebra";
 
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
-  // includes.....a .....
-  camera: any;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
@@ -60,10 +58,6 @@ class R_Canvas {
     this.ctx.closePath();
   }
 
-  cpoint_offset(x: any, y: any, point: { x: any; y: any; }) {
-    this.cpoint({x: point.x + x, y: point.y + y});
-  }
-
   cngon(listofpoints: any[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
     listofpoints.push(listofpoints[0]);
     listofpoints.push(listofpoints[1]);
@@ -116,6 +110,12 @@ class R_Canvas {
     if (clear) {
       this.clear(drawRect);
     }
+
+    let dimension2DOnly = [...dimensionRestraints]; // <---- is this useless code???
+    for (let d =0;d<dimension2DOnly.length;d++)
+    if (dimension2DOnly[d].length > 2) {
+      dimension2DOnly[d].pop();
+    }
     // this.ctx.fillStyle = "#1e7cea";
     // this.ctx.fillRect(0, 0, width, height);
     this.ctx.font = '14px serif';
@@ -142,12 +142,8 @@ class R_Canvas {
         i, drawRect.y,
         i, drawRect.y - spacing / 2
       );
-
-      // console.log(`[canvas.ts 206] Drawing board now:", ${i},
-      // ${dimensionRestraints},
-      // ${drawRect.toArray()}`);
-      console.assert((dimensionRestraints.length) > 0);
-      let dimensionVals = Algebra.Project([i, drawRect.y], drawRect.toArray(), dimensionRestraints, false);
+      console.assert((dimension2DOnly.length) > 0);
+      let dimensionVals = Algebra.ScalarProjection([i, drawRect.y], drawRect.toArray(), dimension2DOnly, false);
       // hmmm, fail then fail all mechanism --> designate point of catch explicitly?
       if (!dimensionVals.length) return;
       this.ctx.fillText(String(dimensionVals[0].toFixed(decimalPlaces)), i - spacing, drawRect.y - 23);
@@ -159,7 +155,7 @@ class R_Canvas {
       this.cline(drawRect.x, i, drawRect.x - spacing / 2, i);
       // this.ctx.fillText(String(i-drawRect.y), drawRect.x - 32, i + 5);
 
-      let dimensionVals = Algebra.Project([drawRect.x, i], drawRect.toArray(), dimensionRestraints, false);
+      let dimensionVals = Algebra.ScalarProjection([drawRect.x, i], drawRect.toArray(), dimension2DOnly, false);
       this.ctx.fillText(String((dimensionVals[1]).toFixed(decimalPlaces)), drawRect.x - 32, i + 5);
     }
   }

@@ -7,7 +7,7 @@
 /**
  * Similar to a mapping function, convenience.
  * @param func: function to run on each array index
- * @param array: javscript array
+ * @param array: javascript array
  * @constructor
  */
 function ForEachArrayIndex(func: any, array: any[]) {
@@ -23,6 +23,10 @@ function ForEachArrayItem(func: any, array: any[]) {
 }
 
 function ForEachObjectKey(func: any, object: { }) {
+  ForEachArrayItem(func, Object.keys(object));
+}
+
+function ForEachObjectItem(func: any, object: { }) {
   ForEachArrayItem(func, Object.keys(object));
 }
 
@@ -73,6 +77,7 @@ export {
   ForEachArrayIndex,
   ForEachArrayItem,
   ForEachObjectKey,
+  ForEachObjectItem,
 
   Accumulator,
   CompositeFunc

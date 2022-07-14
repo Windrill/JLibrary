@@ -1,6 +1,7 @@
 import {D_Point, NDArray, OneDArray} from "./structures";
 import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
+import * as math from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
@@ -32,7 +33,6 @@ class Algebra {
     let projectionZ = (point[2]-renderDimensions[0]) / renderSize;
     // console.log(projectionZ , "(", renderSize, point[2], renderDimensions[0]);
 
-
     let fullPoints = C_ARRAY_ELEMENT_SCALE(C_ARRAY_COPY(point), projectionZ);
     fullPoints.pop();
 
@@ -41,13 +41,14 @@ class Algebra {
   }
 
   /**
-   * Each index = 1 dimension, locationRange & projectedRange is 1 array to 1 element in location array
-   * Supporting 3D now...
-   * 1. If projectedRange(range only for x) < location.size(x, y), something went wrong, so do a print.
-
-   * @param location
-   * @param locationRange
-   * @param projectedRange
+   *
+   * Projects 1 (rectangular) range to another (rectangular) range. Support multi-dimensions.
+   *
+   * Note for the formation of the matrix, parallel lines still stay parallel after scalar projection (for now)
+   * Relative distance between points are also constant, hence we only take the rectangular resize points' representation
+   * @param location  eg. (10, 12)
+   * @param varRange       // variable: eg. from 2 to 20\
+   * @param locationRange <-- 600 to 1000
    * @param debug
    *
    * @constructor
@@ -55,46 +56,59 @@ class Algebra {
    * @return 1 dimension array like locations
    * Optimization: Project along a linearly & equally spaced area
    * Possible to allow locationRange = [default] which projects the line itself to projectedRange
+   *
    */
-  static Project(location: OneDArray, locationRange: NDArray, projectedRange: NDArray, debug: boolean = false): OneDArray {
-    let projected: OneDArray = [];
-    // projected range needed to have 2....
-    /*
-    projectedRange for sure will be 2D
-    //projectedRange.length <-- drect's render size
-     */
-    let minProjectability = Math.min(location.length, locationRange.length);
-
-    // let wNormalizer = location[2] / (locationRange[2][0] - locationRange[2][1]);
+  static ScalarProjection(location: OneDArray, varRange: NDArray,locationRange: NDArray, debug: boolean = false): OneDArray {
+    let minProjectability = Math.min(Math.min(location.length, locationRange.length), varRange.length);
+    // console.log("projecting in : ",minProjectability, " dims", location);
     // TODO Interactive console for this
-    // if (minProjectability < location.length) {
     // oh lol what if you gave extra output...like 'losses' outputs.. anwyays disabling this for now
-    //   console.log(`You're calculating these incorrectly! Maybe during 'runtime check' you make sure you're ok
+    // console.log(`DEBUG:
     //   Location: ${location}
-    //   Projection Range: ${projectedRange}
-    //   Location Range: ${locationRange}`);
-    // }
-    // 1. normalize Z for projection
+    //   Variable Range: ${varRange}
+    //   Screen Location Range: ${locationRange}`);
+    let matrixData: NDArray = [];
+    // last column of matrix is for translation constants, others are x, y, z....
+    let dimensions = minProjectability;
+
+    // for 2 dimensions, there are only 2 rows to this matrix. i didnt add the last row of 0, 0, 1. it's like a
+    // 3 by 4 matrix to save the last row in a 4 by 4 matrix.
     for (let i = 0; i < minProjectability; i++) {
-      // actually should be equivalent...since w is normalized.
-      if (i >= 2) {
-        projected.push(location[i]);
-        continue;
-      }
-      // min and max
-      console.assert(locationRange[i].length == 2 && projectedRange[i].length == 2);
-      let normalizedNumber = (location[i] - locationRange[i][0]) / (locationRange[i][1] - locationRange[i][0]);
+      let matrixRow = [];
+      let c = varRange[i][0];
+      let y = varRange[i][1];
 
-      if (debug) {
-        console.assert(typeof location[i] == "number");
-        // console.log(`TOTAL:[${locationRange}] NormalizedNumber ${normalizedNumber} = (${location[i]} - ${locationRange[i][0]} / (${locationRange[i][1]} - ${locationRange[i][0]});`);
+      let a = locationRange[i][0];
+      let v = locationRange[i][1];
+
+      for (let j = 0; j < dimensions; j++) {
+        if (j == i)
+          matrixRow.push(
+            (v - a) / (y - c)
+          );
+        else
+          matrixRow.push(0);
       }
 
-      let projectedNumber = projectedRange[i][0] + (normalizedNumber * (projectedRange[i][1] - projectedRange[i][0]));
-      projected.push(projectedNumber);
+      matrixRow.push(
+        a - c * (v - a) / (y - c)
+      );
+      matrixData.push(matrixRow);
     }
+    let locationWScale: OneDArray = [...location];
+    // ???? hacky. basically i have location=3 coordinates and dimension = 2
+    if (matrixData[0].length > locationWScale.length) {
+      locationWScale.push(1);
+    }
+
+    // Typescript parsing issue: you're only translating to more generic units? How to make sure this
+    // specialization is reflected
+    // eg. multiply<T typeof MathArray | MathType | Unit> (x: T, y: T): T
+    let projected = math.multiply(matrixData, locationWScale);
+    // console.log("Projected results: ", projected);
     return projected;
   } // end Project
+
 
   // ????? why cant you unionize it. find the innermost 1D array, and merge them
   static Average(dims : OneDArray) {
@@ -135,14 +149,39 @@ Array.prototype.reshape = function (rows, cols) {
     this.push(row);
   }
 };
-
+// what stupid idea is this??? can you do element wise multiplication
+// don't go so nute
 const C_DOT = (a: D_Point, v: D_Point) => {
-  return a.x * v.x + a.y * v.y;
+  // how do you indicate some data????
+  // let sum : number = 0;
+  // ForEachObjectKey(a, (k) => {
+  //   sum += a[k] * v[k];
+  // });
+  return a.x * v.x + a.y * v.y + a.z * v.z;
+
 };
-const C_CROSS = (a: D_Point, v: { y: number; x: number; }) => {
-  return a.x * v.y - a.y * v.x;
+
+// Vector perpendicular to the plane tha contains A & B. Magnitude is magA * magB * sin(theta)
+const C_CROSS = (a: D_Point, b: D_Point) : D_Point => {
+  if (!a.zValid || !b.zValid) {
+    console.log("Crossing 2D vector");
+    return new D_Point(
+      a.x * b.y,
+      b.x * a.y);
+  }
+
+  // console.log(`debugging:
+  //   ${a.y*b.z} - ${a.z*b.y},
+  //   ${a.z*b.x} - ${a.x*b.z},
+  //   ${a.x*b.y}-${a.y*b.x}`);
+
+  return new D_Point(
+    a.y*b.z - a.z*b.y,
+    a.z*b.x - a.x*b.z,
+    a.x*b.y-a.y*b.x
+  );
 };
-const C_DIST = (a: D_Point, v: { x: number; y: any; }) => {
+const C_DIST = (a: D_Point, v: D_Point) => {
   return a.x * v.x + a.y * v.y;
 };
 const C_OBJ_ELEMENT_MINUS = (a: D_Point, b: D_Point) => {

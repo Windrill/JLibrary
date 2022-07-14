@@ -1,4 +1,6 @@
 // input: h in [0,360] and s,v in [0,1] - output: r,g,b in [0,1]
+import {clamp} from "three/src/math/MathUtils";
+
 function hsl2rgb(h: number, s: number, l: number)
 {
   let a=s*Math.min(l,1-l);
@@ -28,10 +30,14 @@ function componentToHex(c: any) {
   if (typeof component == "string") {
     component = parseInt(component);
   }
-  var hex = parseInt(component).toString(16);
+  let safeComponent = clamp(component, 0, 255);
+  var hex = parseInt(safeComponent).toString(16);
   return hex.length == 1 ? "0" + hex : hex;
 }
 
+/*
+Requirements: will interpret as integer from 0 to 255
+ */
 function rgbToHex(r: any, g: any, b: any) {
   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
