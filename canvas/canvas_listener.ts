@@ -96,5 +96,28 @@ class Listener {
 
 export {
   Listener,
-
 }
+
+// Using event dispatcher instead
+/*
+
+class Car extends EventDispatcher {
+  start () {
+    this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+  }
+  end () {
+    this.dispatchEvent( { type: 'end', message: 'vroom vroom!' } );
+  }
+}
+
+let cc = new Car();
+cc.addEventListener("end", (e : ListenerEvent) => {
+  console.log("Listened to start done");
+  // console.log(e.message);
+});
+// cc.hasEventListener("prod");
+cc.start();
+cc.end();
+// let aa : EventLambda = ()=>{};
+
+ */
