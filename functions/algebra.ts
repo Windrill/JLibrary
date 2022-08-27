@@ -2,6 +2,7 @@ import {D_Point, NDArray, OneDArray} from "./structures";
 import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
 import * as math from "mathjs";
+import {matrix} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
@@ -58,8 +59,10 @@ class Algebra {
    * Possible to allow locationRange = [default] which projects the line itself to projectedRange
    *
    */
-  static ScalarProjection(location: OneDArray, varRange: NDArray,locationRange: NDArray, debug: boolean = false): OneDArray {
-    let minProjectability = Math.min(Math.min(location.length, locationRange.length), varRange.length);
+  //location: OneDArray,
+  //Math.min(location.length,
+  static ScalarProjection(varRange: NDArray,locationRange: NDArray, debug: boolean = false): NDArray {
+    let minProjectability = Math.min(locationRange.length, varRange.length);
     // console.log("projecting in : ",minProjectability, " dims", location);
     // TODO Interactive console for this
     // oh lol what if you gave extra output...like 'losses' outputs.. anwyays disabling this for now
@@ -69,7 +72,6 @@ class Algebra {
     //   Screen Location Range: ${locationRange}`);
     let matrixData: NDArray = [];
     // last column of matrix is for translation constants, others are x, y, z....
-    let dimensions = minProjectability;
 
     // for 2 dimensions, there are only 2 rows to this matrix. i didnt add the last row of 0, 0, 1. it's like a
     // 3 by 4 matrix to save the last row in a 4 by 4 matrix.
@@ -81,7 +83,7 @@ class Algebra {
       let a = locationRange[i][0];
       let v = locationRange[i][1];
 
-      for (let j = 0; j < dimensions; j++) {
+      for (let j = 0; j < minProjectability; j++) {
         if (j == i)
           matrixRow.push(
             (v - a) / (y - c)
@@ -95,26 +97,30 @@ class Algebra {
       );
       matrixData.push(matrixRow);
     }
+    return matrixData;
+    // console.log("Projected results: ", projected);
+  } // end Project
+
+  // blurry multiplication
+  static CMatrixMult(matrixData : NDArray, location : OneDArray) : OneDArray {
     let locationWScale: OneDArray = [...location];
     // ???? hacky. basically i have location=3 coordinates and dimension = 2
     if (matrixData[0].length > locationWScale.length) {
       locationWScale.push(1);
     }
-
     // Typescript parsing issue: you're only translating to more generic units? How to make sure this
     // specialization is reflected
     // eg. multiply<T typeof MathArray | MathType | Unit> (x: T, y: T): T
     let projected = math.multiply(matrixData, locationWScale);
-    // console.log("Projected results: ", projected);
     return projected;
-  } // end Project
-
+  }
 
   // ????? why cant you unionize it. find the innermost 1D array, and merge them
   static Average(dims : OneDArray) {
     let arraySum = Accumulator(FUNCAccumulatorSum, dims);
     return arraySum / dims.length;
   }
+
   // lol, useless function, only called by 1 party
   static GetMidpoint(dimensions : NDArray) : OneDArray {
     let midpoint : number[] = [];

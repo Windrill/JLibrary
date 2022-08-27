@@ -134,6 +134,7 @@ class R_Canvas {
     |  .   .   .    .    .   .   .
     _________________________________ <--- line2:
      */
+    let axisProj = Algebra.ScalarProjection(drawRect.toArray(), dimension2DOnly, false);
 
     // X Axis
     for (let i = drawRect.x; i <= drawRect.x + drawRect.width; i += 40) {
@@ -143,7 +144,8 @@ class R_Canvas {
         i, drawRect.y - spacing / 2
       );
       console.assert((dimension2DOnly.length) > 0);
-      let dimensionVals = Algebra.ScalarProjection([i, drawRect.y], drawRect.toArray(), dimension2DOnly, false);
+      // hmm???
+      let dimensionVals = Algebra.CMatrixMult(axisProj, [i, drawRect.y]);
       // hmmm, fail then fail all mechanism --> designate point of catch explicitly?
       if (!dimensionVals.length) return;
       this.ctx.fillText(String(dimensionVals[0].toFixed(decimalPlaces)), i - spacing, drawRect.y - 23);
@@ -154,8 +156,7 @@ class R_Canvas {
       // y axis
       this.cline(drawRect.x, i, drawRect.x - spacing / 2, i);
       // this.ctx.fillText(String(i-drawRect.y), drawRect.x - 32, i + 5);
-
-      let dimensionVals = Algebra.ScalarProjection([drawRect.x, i], drawRect.toArray(), dimension2DOnly, false);
+      let dimensionVals = Algebra.CMatrixMult(axisProj, [drawRect.x, i]);
       this.ctx.fillText(String((dimensionVals[1]).toFixed(decimalPlaces)), drawRect.x - 32, i + 5);
     }
   }
