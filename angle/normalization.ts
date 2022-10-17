@@ -1,3 +1,5 @@
+import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
+
 let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   let period = to - from;
   if (period < 0) {
@@ -21,6 +23,27 @@ let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   }
   return angle;
 }
+
+// vector2
+// angle in between 2 vectors
+let GetAngleDiff2D = (vec1: number[], vec2: number[]) => {
+  // first you orthogonize the 2 angles, then you get the angle
+  let angleRes = C_ARRAY_COPY(vec2);
+  C_ARRAY_ELEMENT_SUB(angleRes, vec1);
+
+  let angleDeg = 1;
+  let y = angleRes[1];
+  let x = angleRes[0];
+  console.assert (angleRes.length == 2);
+  if (angleRes.length == 2) {
+    angleDeg = NormalizeWithinPeriod(Math.atan2(y, x) / 3.14 * 180, 0, 360) / 360;
+  }
+  return angleDeg;
+  // then add angle1's angle to??
+
+}
+
+
 
 export {
   NormalizeWithinPeriod

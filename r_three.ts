@@ -1,9 +1,9 @@
 import * as THREE from 'three'
-import {D_Point, OneDArray} from "./functions/structures";
+import {D_Point, OneDArray, QuackingV2, QuackingV3} from "./functions/structures";
 import {Vector2, Vector3} from "three";
 // Also you might want some common variables
-const ORG2 = new Vector2(0, 0, 0);
-const UP2 = new Vector2(0, 1, 0);
+const ORG2 = new Vector2(0, 0);
+const UP2 = new Vector2(0, 1);
 
 const ORG = new Vector3(0, 0, 0);
 const UP = new Vector3(0, 1, 0);
@@ -39,18 +39,18 @@ class utils {
     return {x: arr[0], y: arr[1]};
   };
 
-  static uv(o: D_Point) {
+  static uv(o: QuackingV2) {
     return [o.x, o.y];
   }
 
   // subtract array 2 from array 1
-  static sv(arr1, arr2) {
+  static sv(arr1: number[], arr2: number[]) {
     return arr1.map(function (item, index) {
       return item - arr2[index];
     });
   }
 
-  static isAgnosticLeft(a, b, c, debug = false) {
+  static isAgnosticLeft(a : QuackingV2, b: QuackingV2, c: QuackingV2, debug = false) {
     if (a.y > b.y) {
       return this.isLeft(b, a, c, debug);
     } else {
@@ -59,7 +59,7 @@ class utils {
   }
 
   // if c is left of ab
-  static isLeft(a, b, c, debug = false) {
+  static isLeft(a: QuackingV2, b: QuackingV2, c: QuackingV2, debug = false) {
     if (debug) {
       console.log(`${utils.uv(a)}, ${utils.uv(b)}, ${utils.uv(c)}`);
     }
@@ -67,20 +67,20 @@ class utils {
   }
 
   // interpret an axis as 3 float positions
-  static interpret(axis) {
+  static interpret(axis : QuackingV3) {
     if (!Array.isArray(axis)) {
       return [axis.x, axis.y, axis.z];
     }
     return axis;
   }
 
-  static setMatFromArr(m, a) {
+  static setMatFromArr(m : THREE.Matrix4, a: number[]) {
     m.set(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11], a[12], a[13], a[14], a[15]);
   }
 
-  static rotateAboutWorldAxis(object, axis, angle) {
+  static rotateAboutWorldAxis(object, axis, theta: number) {
     let rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(axis.normalize(), angle);
+    rotationMatrix.makeRotationAxis(axis.normalize(), theta);
     let currentPos = new THREE.Vector4(object.position.x, object.position.y, object.position.z, 1);
     let newPos = currentPos.applyMatrix4(rotationMatrix);
     object.position.x = newPos.x;
@@ -89,11 +89,11 @@ class utils {
   }
 
   // axis-angle to matrix4
-  static rotate_aa(axis, angle) {
+  static rotate_aa(axis: QuackingV3, theta: number) {
     let [x, y, z] = utils.interpret(axis);
-    let t = 1 - Math.cos(angle);
-    let c = Math.cos(angle);
-    let s = Math.sin(angle);
+    let t = 1 - Math.cos(theta);
+    let c = Math.cos(theta);
+    let s = Math.sin(theta);
     // classic gems, glassner academic press 1990
     let mat = new THREE.Matrix4().set(
       t * x * x + c, t * x * y + s * z + s * z, t * x * z - s * y, 0,

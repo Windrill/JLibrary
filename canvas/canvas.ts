@@ -1,5 +1,12 @@
-import {D_Point, D_Rect, NDArray, NormalizePoint} from "../functions/structures";
+import {D_Point, D_Rect, NDArray, NormalizePoint, QuackingV2} from "../functions/structures";
 import {Algebra} from "../functions/algebra";
+
+interface DrawStyle {
+  fillStyle: string; // "#000000";
+  debug: boolean; // false
+  lineWidth: number; // 1;
+}
+// Have an object supply default values for this interface.
 
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
@@ -12,17 +19,19 @@ class R_Canvas {
 
   }
 
-  //easy projecct first x/z, y/z
+  //easy project first x/z, y/z
   // CameraProjection(point: D_Point) {
-    // takes in 3D dot, outputs 2D projection
-    // you wanted this to also support 3d scaling..............
+  // takes in 3D dot, outputs 2D projection
+  // you wanted this to also support 3d scaling..............
 
-    // THREE.Matrix4();
+  // THREE.Matrix4();
   // }
 
+  // what does direction represent??? i think just a ratio.... lol, can be forced to represent magnitude too,
+  // but it's just that magnitude didnt need to be so much 'implied'
   // pass down
-  carrow(point: D_Point, direction: D_Point, magnitude: number, ...Args : any) {
-    // let normPoint = NormalizePoint(point);
+  // 1 is down, -1 is up
+  carrow(point: QuackingV2, direction: QuackingV2, magnitude: number, ...Args: any) {
     let normDirection = NormalizePoint(direction);
     let endOfLine = {
       x: point.x + normDirection.x * magnitude,
@@ -31,7 +40,7 @@ class R_Canvas {
     this.cline(point.x, point.y, endOfLine.x, endOfLine.y,
       Args[0]
 //{fillStyle: "#126cb4", debug: false, lineWidth: 2}
-      );
+    );
     let arrowFlapFromTrunk = magnitude / 5;
 
 
@@ -39,8 +48,7 @@ class R_Canvas {
     // how to draw this line perpendicular from the main line
     let topFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, 40);
     this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, Args[0]
-      // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
-  );
+    );
 
 
     let bottomFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
@@ -50,8 +58,9 @@ class R_Canvas {
     );
 
   }
+
 // , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
-  cpoint(point: D_Point) {
+  cpoint(point: QuackingV2) {
     this.ctx.beginPath();
     this.ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
     this.ctx.fill();
@@ -75,6 +84,7 @@ class R_Canvas {
   }
 
   // TODO: Organize styles and document, fix it such that these options are optional
+  // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
   cline(a: number, b: number, x: number, y: number, {fillStyle, debug, lineWidth} = {
     fillStyle: "#000000",
     debug: false,
@@ -91,6 +101,18 @@ class R_Canvas {
     this.ctx.moveTo(a, b);
     this.ctx.lineTo(x, y);
     this.ctx.stroke();
+    this.ctx.closePath();
+  }
+  
+  crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = {
+    fillStyle: "#000000",
+    debug: false,
+    lineWidth: 1
+  }) {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = fillStyle;
+    this.ctx.rect(a, b, w, h);
+    this.ctx.fill();
     this.ctx.closePath();
 
   }
@@ -112,10 +134,10 @@ class R_Canvas {
     }
 
     let dimension2DOnly = [...dimensionRestraints]; // <---- is this useless code???
-    for (let d =0;d<dimension2DOnly.length;d++)
-    if (dimension2DOnly[d].length > 2) {
-      dimension2DOnly[d].pop();
-    }
+    for (let d = 0; d < dimension2DOnly.length; d++)
+      if (dimension2DOnly[d].length > 2) {
+        dimension2DOnly[d].pop();
+      }
     // this.ctx.fillStyle = "#1e7cea";
     // this.ctx.fillRect(0, 0, width, height);
     this.ctx.font = '14px serif';

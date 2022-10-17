@@ -1,18 +1,23 @@
-import {D_Point, NDArray, OneDArray} from "./structures";
+import {D_Point, NDArray, OneDArray, QuackingV2, QuackingV3} from "./structures";
 import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
 import * as math from "mathjs";
-import {matrix} from "mathjs";
+// import {matrix} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
-function Polar2Cartesian(r: number, theta: number) {
+function Polar2Cartesian(r: number, theta: number) : QuackingV2 {
   return {
     x: r * Math.cos(theta),
     y: r * Math.sin(theta)
   }
+}
+
+// x: number, y: number
+function Cartesian2Polar(xy: QuackingV2) {
+  return Math.atan2(xy.y, xy.x);
 }
 
 // can't do this 'specializatio'n
@@ -20,7 +25,7 @@ function Polar2Cartesian(r: number, theta: number) {
 
 class Algebra {
   // Project in terms of polar coordinates, returns cartesian
-  static ProjectP(baseLineVector: D_Point, magnitude: number, projectAngle: number) {
+  static ProjectP(baseLineVector: QuackingV2 | QuackingV3, magnitude: number, projectAngle: number) {
     // baseLine's radian angle + projectAngle's radian angle --> new angle --> convert to cartesian
     let twoFrameAngle = Math.atan2(baseLineVector.y, baseLineVector.x) + DEG2RAD * (projectAngle);
     return Polar2Cartesian(magnitude, twoFrameAngle);
@@ -29,7 +34,7 @@ class Algebra {
   // -4, 3 --> 0, 1 (multiply by range, actually this is not offset this is range)
   // just projecting on the 3rd axis.
   // real offset abt x point....
-  static ProjectAxis(point: OneDArray, renderDimensions: OneDArray, offset: OneDArray = [0,0]) {
+  static ProjectAxis(point: OneDArray, renderDimensions: OneDArray, _offset: OneDArray = [0,0]) {
     let renderSize = renderDimensions[1] - renderDimensions[0];
     let projectionZ = (point[2]-renderDimensions[0]) / renderSize;
     // console.log(projectionZ , "(", renderSize, point[2], renderDimensions[0]);
@@ -60,9 +65,8 @@ class Algebra {
    *
    */
   //location: OneDArray,
-  //Math.min(location.length,
-  static ScalarProjection(varRange: NDArray,locationRange: NDArray, debug: boolean = false): NDArray {
-    let minProjectability = Math.min(locationRange.length, varRange.length);
+  static ScalarProjection(varRange: NDArray,locationRange: NDArray, _debug: boolean = false): NDArray {
+    let minProjectability = Math.min(locationRange.length, varRange.length); //Math.min(location.length,
     // console.log("projecting in : ",minProjectability, " dims", location);
     // TODO Interactive console for this
     // oh lol what if you gave extra output...like 'losses' outputs.. anwyays disabling this for now
@@ -155,6 +159,7 @@ Array.prototype.reshape = function (rows, cols) {
     this.push(row);
   }
 };
+
 // what stupid idea is this??? can you do element wise multiplication
 // don't go so nute
 const C_DOT = (a: D_Point, v: D_Point) => {
@@ -205,6 +210,13 @@ function C_ARRAY_COPY(a: any[]): any[] {
 function C_ARRAY_ELEMENT_ADD(a: any[], b: any[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] += b[i];
+  }
+  return a;
+}
+
+function C_ARRAY_ELEMENT_SUB(a: any[], b: any[]) {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    a[i] -= b[i];
   }
   return a;
 }
@@ -278,11 +290,13 @@ export {
   C_ARRAY_COPY,
   C_OBJ_ELEMENT_MINUS,
   C_ARRAY_ELEMENT_ADD,
+  C_ARRAY_ELEMENT_SUB,
   C_ARRAY_ELEMENT_MULT,
   C_ARRAY_ELEMENT_SCALE,
   SYN_GetMethods,
 
-  Polar2Cartesian
+  Polar2Cartesian,
+  Cartesian2Polar
 }
 
 export {

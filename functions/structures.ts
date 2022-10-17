@@ -1,4 +1,17 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SCALE} from "./algebra";
+import {exp} from "mathjs";
+
+// Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
+interface QuackingV2 {
+  x: number,
+  y: number
+}
+
+interface QuackingV3 {
+  x: number,
+  y: number,
+  z: number
+}
 
 /*
 converts
@@ -93,6 +106,7 @@ class D_Rect {
     ];
   }
 
+  // Todo: Standardize this into draw instead of show
   show(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.lineWidth = 0.5;
@@ -123,8 +137,8 @@ class D_Rect {
 class D_Point {
   x: number;
   y: number;
-  z: number;
-  zValid: boolean;
+  z: number = 0;
+  zValid: boolean = false;
   constructor(x : number, y : number, z: number|undefined=undefined) {
     this.x = x;
     this.y = y;
@@ -153,7 +167,7 @@ function NormalizeX(...args: number[]): number[] {
   return ret;
 }
 
-function NormalizePoint(p: D_Point) {
+function NormalizePoint(p: QuackingV2 | QuackingV3) {
   let mag = Math.sqrt(p.x * p.x + p.y * p.y);
   return {
     x: p.x / mag,
@@ -215,4 +229,9 @@ export {
 }
 export {
   MidPointToTopLeft
+}
+
+export {
+  QuackingV2,
+  QuackingV3
 }
