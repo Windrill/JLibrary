@@ -1,3 +1,24 @@
+How to install: (need dependent node libraries!)
+not sure if this is everything or excessive
+  "devDependencies": {
+    "@types/dat.gui": "^0.7.7",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.6"
+  },
+  "dependencies": {
+    "@types/three": "^0.141.0",
+    "dat.gui": "^0.7.9",
+    "mathjs": "^10.6.1",
+    "three": "^0.141.0"
+  }
+}
+Note that it's mathjs not math.js
+
+================================
+How to import threejs properly:
+import * as THREE from 'three'
+
+
 Style
 // D_ data structure (data only)
 // R_ draw calls related (render)

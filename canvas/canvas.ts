@@ -8,6 +8,8 @@ interface DrawStyle {
 }
 // Have an object supply default values for this interface.
 
+
+// No such thing as 'drawing context', more generic. with geometric and other shapes.
 class R_Canvas {
   ctx: CanvasRenderingContext2D;
 
