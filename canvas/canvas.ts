@@ -1,26 +1,51 @@
-import {D_Point, D_Rect, NDArray, NormalizePoint, QuackingV2} from "../functions/structures";
+import {
+  CanvasContext,
+  CanvasPassAlong,
+  D_Point,
+  D_Rect,
+  NDArray,
+  NormalizePoint,
+  QuackingV2
+} from "../functions/structures";
 import {Algebra} from "../functions/algebra";
 
+
+// Options settings....
 interface DrawStyle {
-  fillStyle: string; // "#000000";
-  debug: boolean; // false
-  lineWidth: number; // 1;
+  fillStyle: string;
+  strokeStyle: string;
+  fontStyle: string;
+  debug: boolean;
+  lineWidth: number;
+  textStyle: string;
 }
+
+function initDrawStyle(options?: Partial<DrawStyle>): DrawStyle {
+  const defaults = {
+    fillStyle: "#61adc4",
+    strokeStyle: "#ffffff",
+    fontStyle: "16px serif",
+    debug: false,
+    lineWidth: 1,
+    textStyle: "#bd9696",
+  };
+
+  return {
+    ...defaults,
+    ...options,
+  };
+}
+
 // Have an object supply default values for this interface.
 
 
 // No such thing as 'drawing context', more generic. with geometric and other shapes.
-class R_Canvas {
-  ctx: CanvasRenderingContext2D;
-
-  constructor(ctx: CanvasRenderingContext2D) {
-    this.ctx = ctx;
+class R_Canvas extends CanvasPassAlong {
+  public styles : DrawStyle;
+  constructor(context: CanvasContext) {
+    super(context);
+    this.styles = initDrawStyle();
   }
-
-  destructor() {
-
-  }
-
   //easy project first x/z, y/z
   // CameraProjection(point: D_Point) {
   // takes in 3D dot, outputs 2D projection
@@ -58,31 +83,41 @@ class R_Canvas {
       Args[0]
       // {fillStyle: "#126cb4", debug: true, lineWidth: 3}
     );
-
   }
 
 // , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
-  cpoint(point: QuackingV2) {
-    this.ctx.beginPath();
-    this.ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
-    this.ctx.fill();
-    this.ctx.closePath();
+  cpoint(point: QuackingV2, name = "",
+    radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2,
+         anticlockwise = false, color = "#000000") {
+    this.context.ctx.beginPath();
+    this.context.ctx.fillStyle = color;
+    this.context.ctx.arc(point.x, point.y, radius, startAngle, endAngle);
+    this.context.ctx.fill();
+    if (name != "") {
+      this.write(name, point.x - 10, point.y - 10);
+    }
+
+    this.context.ctx.closePath();
   }
 
-  cngon(listofpoints: any[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
-    listofpoints.push(listofpoints[0]);
-    listofpoints.push(listofpoints[1]);
+  cpoint_offset(x,y, point) {
+    this.cpoint({x: point.x + x, y: point.y + y});
+  }
+
+  cngon(listOfPoints: any[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
+    listOfPoints.push(listOfPoints[0]);
+    listOfPoints.push(listOfPoints[1]);
     if (debug) {
       console.log("Ngon is OK");
     }
-    this.ctx.fillStyle = fillStyle;
-    this.ctx.beginPath();
-    for (let i = 0; i < listofpoints.length - 2; i += 2) {
-      this.ctx.moveTo(listofpoints[i], listofpoints[i + 1]);
-      this.ctx.lineTo(listofpoints[i + 2], listofpoints[i + 3]);
-      this.ctx.stroke();
+    this.context.ctx.fillStyle = fillStyle;
+    this.context.ctx.beginPath();
+    for (let i = 0; i < listOfPoints.length - 2; i += 2) {
+      this.context.ctx.moveTo(listOfPoints[i], listOfPoints[i + 1]);
+      this.context.ctx.lineTo(listOfPoints[i + 2], listOfPoints[i + 3]);
+      this.context.ctx.stroke();
     }
-    this.ctx.closePath();
+    this.context.ctx.closePath();
   }
 
   // TODO: Organize styles and document, fix it such that these options are optional
@@ -95,27 +130,27 @@ class R_Canvas {
     if (debug) {
       console.log(`${a},${b} to ${x},${y}`);
     }
-    this.ctx.lineWidth = lineWidth;
-    this.ctx.fillStyle = fillStyle;
+    this.context.ctx.lineWidth = lineWidth;
+    this.context.ctx.fillStyle = fillStyle;
     // TODO, make more proper
-    this.ctx.strokeStyle = fillStyle;
-    this.ctx.beginPath();
-    this.ctx.moveTo(a, b);
-    this.ctx.lineTo(x, y);
-    this.ctx.stroke();
-    this.ctx.closePath();
+    this.context.ctx.strokeStyle = fillStyle;
+    this.context.ctx.beginPath();
+    this.context.ctx.moveTo(a, b);
+    this.context.ctx.lineTo(x, y);
+    this.context.ctx.stroke();
+    this.context.ctx.closePath();
   }
-  
+
   crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = {
     fillStyle: "#000000",
     debug: false,
     lineWidth: 1
   }) {
-    this.ctx.beginPath();
-    this.ctx.fillStyle = fillStyle;
-    this.ctx.rect(a, b, w, h);
-    this.ctx.fill();
-    this.ctx.closePath();
+    this.context.ctx.beginPath();
+    this.context.ctx.fillStyle = fillStyle;
+    this.context.ctx.rect(a, b, w, h);
+    this.context.ctx.fill();
+    this.context.ctx.closePath();
 
   }
 
@@ -124,7 +159,7 @@ class R_Canvas {
   }
 
   clear(rect: D_Rect) {
-    (this.ctx).clearRect(rect.x, rect.y, rect.width, rect.height);
+    (this.context.ctx).clearRect(rect.x, rect.y, rect.width, rect.height);
   }
 
   // spacing is to the left bottom direction
@@ -142,9 +177,9 @@ class R_Canvas {
       }
     // this.ctx.fillStyle = "#1e7cea";
     // this.ctx.fillRect(0, 0, width, height);
-    this.ctx.font = '14px serif';
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
+    this.context.ctx.font = this.styles.fontStyle;
+    this.context.ctx.fillStyle = this.styles.fillStyle;
+    this.context.ctx.strokeStyle = this.styles.strokeStyle;
     this.cline(drawRect.x - spacing, drawRect.y, drawRect.x + drawRect.width - spacing, drawRect.y);
     this.cline(drawRect.x, drawRect.y - spacing, drawRect.x, drawRect.y + drawRect.height - spacing);
     // TODO: Add axis labels
@@ -172,7 +207,7 @@ class R_Canvas {
       let dimensionVals = Algebra.CMatrixMult(axisProj, [i, drawRect.y]);
       // hmmm, fail then fail all mechanism --> designate point of catch explicitly?
       if (!dimensionVals.length) return;
-      this.ctx.fillText(String(dimensionVals[0].toFixed(decimalPlaces)), i - spacing, drawRect.y - 23);
+      this.context.ctx.fillText(String(dimensionVals[0].toFixed(decimalPlaces)), i - spacing, drawRect.y - 23);
       // this.ctx.fillText(String(i-drawRect.x), i - spacing, drawRect.y - 23);
     }
 
@@ -181,24 +216,44 @@ class R_Canvas {
       this.cline(drawRect.x, i, drawRect.x - spacing / 2, i);
       // this.ctx.fillText(String(i-drawRect.y), drawRect.x - 32, i + 5);
       let dimensionVals = Algebra.CMatrixMult(axisProj, [drawRect.x, i]);
-      this.ctx.fillText(String((dimensionVals[1]).toFixed(decimalPlaces)), drawRect.x - 32, i + 5);
+      this.context.ctx.fillText(String((dimensionVals[1]).toFixed(decimalPlaces)), drawRect.x - 32, i + 5);
+    }
+  }
+
+  drawBoard(width, height, clear = true) {
+    if (clear)
+      this.clear(new D_Rect(0, 0, width, height));
+    this.context.ctx.fillStyle = this.styles.fillStyle;
+    this.context.ctx.font = this.styles.fontStyle;
+    this.cline(0, 5, width, 5);
+    this.cline(5, 0, 5, height);
+    for (let i = 0; i <= width; i += 40) {
+      // X Axis
+      this.cline(i, 5, i, 10);
+      this.context.ctx.fillText(String(i), i - 10, 23);
+    }
+
+    for (let i = 0; i <= height; i += 40) {
+      // y axis
+      this.cline(5, i, 10, i);
+      this.context.ctx.fillText(String(i), 13, i + 5);
     }
   }
 
   drawMouse(mouseX: number, mouseY: number) {
-    this.ctx.fillText(mouseX + " " + mouseY, mouseX, mouseY);
+    this.context.ctx.fillText(mouseX + " " + mouseY, mouseX, mouseY);
   }
 
   rotatingSquare(x: number, y: number, w: number, h: number, degree: number) {
-    this.ctx.save();
-    this.ctx.translate(x, y);
-    this.ctx.rotate(degree);
-    this.ctx.fillStyle = "#000000";
+    this.context.ctx.save();
+    this.context.ctx.translate(x, y);
+    this.context.ctx.rotate(degree);
+    this.context.ctx.fillStyle = "#000000";
     // Position of rect relative to the 'midpoint', the center of the rectangle
-    this.ctx.rect(-w / 2, -h / 2, w, h);
-    this.ctx.fill();
-    this.ctx.translate(-x, -y);
-    this.ctx.restore();
+    this.context.ctx.rect(-w / 2, -h / 2, w, h);
+    this.context.ctx.fill();
+    this.context.ctx.translate(-x, -y);
+    this.context.ctx.restore();
   }
 
   crad(degree: number) {
@@ -217,11 +272,11 @@ class R_Canvas {
   }
 
   write(text: string, x: number, y: number) {
-    this.ctx.font = '14px serif';
-    this.ctx.fillStyle = "#000000";
-    this.ctx.beginPath();
-    this.ctx.fillText(text, x, y);
-    this.ctx.closePath();
+    this.context.ctx.font = this.styles.fontStyle;
+    this.context.ctx.fillStyle = this.styles.fillStyle;
+    this.context.ctx.beginPath();
+    this.context.ctx.fillText(text, x, y);
+    this.context.ctx.closePath();
   }
 }
 

@@ -1,8 +1,9 @@
-import {D_Point, NDArray, OneDArray, QuackingV2, QuackingV3} from "./structures";
+import {D_Point, NDArray, OneDArray, Quackable, QuackableV2, QuackableV3, QuackingV2, QuackingV3} from "./structures";
 import {utils} from "../r_three";
-import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
-import * as math from "mathjs";
+import {Accumulator, ForEachArrayIndex, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
+// import * as math from "mathjs";
 // import {matrix} from "mathjs";
+import multiply from "../vendor/math"
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
@@ -115,7 +116,8 @@ class Algebra {
     // Typescript parsing issue: you're only translating to more generic units? How to make sure this
     // specialization is reflected
     // eg. multiply<T typeof MathArray | MathType | Unit> (x: T, y: T): T
-    let projected = math.multiply(matrixData, locationWScale);
+    let projected = multiply(matrixData, locationWScale);
+    // let projected = math.multiply(matrixData, locationWScale);
     return projected;
   }
 
@@ -160,22 +162,19 @@ Array.prototype.reshape = function (rows, cols) {
   }
 };
 
-// what stupid idea is this??? can you do element wise multiplication
-// don't go so nute
-const C_DOT = (a: D_Point, v: D_Point) => {
-  // how do you indicate some data????
-  // let sum : number = 0;
-  // ForEachObjectKey(a, (k) => {
-  //   sum += a[k] * v[k];
-  // });
-  return a.x * v.x + a.y * v.y + a.z * v.z;
-
+// Not tested yet
+const C_DOT = (a: Quackable, v: Quackable) => {
+  let sum : number = 0;
+  ForEachObjectKey(a, (k) => {
+    sum += a[k] * v[k];
+  });
+  return sum;
 };
 
 // Vector perpendicular to the plane tha contains A & B. Magnitude is magA * magB * sin(theta)
 const C_CROSS = (a: D_Point, b: D_Point) : D_Point => {
   if (!a.zValid || !b.zValid) {
-    console.log("Crossing 2D vector");
+    // console.log("Crossing 2D vector"); //, a, b, a.x * b.y, b.x * a.y);
     return new D_Point(
       a.x * b.y,
       b.x * a.y);
@@ -192,7 +191,8 @@ const C_CROSS = (a: D_Point, b: D_Point) : D_Point => {
     a.x*b.y-a.y*b.x
   );
 };
-const C_DIST = (a: D_Point, v: D_Point) => {
+
+const C_DIST = (a: QuackingV2, v: QuackingV2) => {
   return a.x * v.x + a.y * v.y;
 };
 const C_OBJ_ELEMENT_MINUS = (a: D_Point, b: D_Point) => {

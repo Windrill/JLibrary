@@ -50,6 +50,17 @@ class utils {
     });
   }
 
+  static angleBetweenVectors(ax, ay, bx, by) {
+    let magA = Math.sqrt(ax * ax + ay * ay);
+    let magB = Math.sqrt(by * by + bx * bx);
+    let magAmagB = magA * magB;
+    if (magA * magB < 0.001) throw "Vectors must be nonzero length";
+    let sinTheta = (ax * by - bx * ay) / magAmagB;
+    let cosTheta = (ax * bx + ay * by) / magAmagB;
+    let theta = Math.atan2(sinTheta, cosTheta);
+    return 180 * (theta / Math.PI);
+  }
+
   static isAgnosticLeft(a : QuackingV2, b: QuackingV2, c: QuackingV2, debug = false) {
     if (a.y > b.y) {
       return this.isLeft(b, a, c, debug);
@@ -188,6 +199,7 @@ class utils {
   }
 }
 
+// Why did i call it C3line when it's 2 dim?
 class C3Line {
   material;
   points: THREE.Vector2[];
@@ -210,6 +222,11 @@ class C3Line {
 
   get() {
     return this.line;
+  }
+
+  cleanup() {
+    this.geometry.dispose();
+    this.material.dispose();
   }
 }
 

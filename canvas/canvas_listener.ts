@@ -2,34 +2,32 @@
 // canvas draw listener
 // import {R_Canvas} from "./canvas";
 //extends R_Canvas
-class Listener {
-  // Typescript declarations
-  element :HTMLElement;
 
+// Event_Dispatcher is for your own system
+// Listener is for windows events, and document events
+
+import {CanvasContext, CanvasPassAlong} from "../functions/structures";
+import {Actionable} from "../../general";
+import {ForEachObjectKey} from "../functions/functional";
+
+class Listener extends CanvasPassAlong {
+  // Typescript declarations
   lambdas: {
     [index: string]: any;
-    // binddown: (e: any) => void;
-    // bindmove: (e: any) => void;
-    // bindup: (e: any) => void;
-    // bindout: (e: any) => void;
+    // func: any;
+    // propagate: boolean;
   }
 
   state: {
     pressed: boolean;
   }
-  private ctx: CanvasRenderingContext2D;
 
-  constructor(ctx: CanvasRenderingContext2D, element: HTMLElement) {
-    this.element = element;
-    this.ctx = ctx;
-    // this.binddown = this.onPointerDown.bind(this);
-    // this.bindmove = this.onPointerDrag.bind(this);
-    // this.bindup = this.onPointerUp.bind(this);
-    // this.bindout = this.onFocusOut.bind(this);
-    // this.element.addEventListener("pointerdown", this.binddown, false);
-    // this.element.addEventListener("pointermove", this.bindmove, false);
-    // this.element.addEventListener("pointerup", this.bindup, false);
-    // this.element.addEventListener("mouseout", this.bindout, false);
+  constructor(context: CanvasContext) {
+    super(context);
+    // Events:
+    /*
+    pointerdown, pointermove, pointerup, mouseout
+     */
 
     // Select states that maintain across functions
     this.state = {
@@ -37,60 +35,34 @@ class Listener {
     };
     this.lambdas = {};
   }
-  setListenFunction(name : string, func : (...args : any)=>any, propogate=false) {
-    this.lambdas[name] = func.bind(this);
-    this.element.addEventListener(name, func, propogate);
+
+  getElement() {
+    return this.context.element;
   }
 
-  // onFocusOut(e: any) {
-  //   console.log(e);
-  //   this.pressed = false;
-  // }
-  //
-  // onPointerDown(e: any) {
-  //   this.mousedown(e);
-  //   if (!this.pressed) this.mousedownevent(e);
-  //   this.pressed = true;
-  // }
-  //
-  // onPointerDrag(e: any) {
-  //   console.log(e);
-  //   if (!this.pressed) return;
-  //   this.mousemove(e);
-  // }
-  //
-  // onPointerUp(e: any) {
-  //   this.pressed = false;
-  //   this.mouseup(e);
-  // }
-  //
-  // mousedown(e: any) {
-  //   console.log(e);
-  // };
-  //
-  // mousemove(e: any) {
-  //   console.log(e);
-  // }
-  //
-  // mouseup(e: any) {
-  //   console.log(e);
-  // }
-  //
-  // mousedownevent(e: any) {
-  //   console.log(e);
-  // }
+  // need to make into array
+  setListenFunction(name: string, func: (...args: any) => any, propagate = false) {
+    let boundFunc = func.bind(this);
+    this.lambdas[name] = {func: boundFunc, propagate: propagate};
 
-  action() {
+    let element = this.context.element;
+    element.addEventListener(name, boundFunc, propagate);
   }
 
-  destructor() {
-    for (let lam in Object.keys(this.lambdas)) {
-      this.element.removeEventListener(lam, this.lambdas[lam], false);
+  cleanup() {
+    if (!this.lambdas) {
+      return;
     }
+    // for (let lam in Object.keys(this.lambdas)) {
+    ForEachObjectKey((lam) => {
+      let element = this.context.element;
+      console.log("Cleanup lambda ", this.lambdas, lam, this.lambdas[lam]);
+      element.removeEventListener(lam, this.lambdas[lam].func, this.lambdas[lam].propagate);
+    }, this.lambdas);
+
+    //    this.binddown = this.onPointerDown.bind(this);
+    //    this.element.addEventListener("pointerdown", this.binddown, false);
     // this.element.removeEventListener("pointerdown", this.binddown, false);
-    // this.element.removeEventListener("pointermove", this.bindmove, false);
-    // this.element.removeEventListener("pointerup", this.bindup, false);
-    // this.element.removeEventListener("mouseout", this.bindout, false);
   }
 }
 

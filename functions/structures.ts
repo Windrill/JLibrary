@@ -1,5 +1,5 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SCALE} from "./algebra";
-import {exp} from "mathjs";
+import {R_Canvas} from "../canvas/canvas";
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
@@ -11,6 +11,52 @@ interface QuackingV3 {
   x: number,
   y: number,
   z: number
+}
+
+// All this work is already done in CPP
+type Quackable = QuackingV2 | QuackingV3;
+const QuackableV2 = (x: Quackable): x is QuackingV2 => true;
+const QuackableV3 = (x: Quackable): x is QuackingV3 => true;
+
+interface WidthHeight {
+  W: number,
+  H: number
+}
+
+enum BackendType {
+  HTML5Backend,
+  THREEBackend
+}
+
+// Object
+interface CanvasContext {
+  ctx?: CanvasRenderingContext2D
+  canvasSize?: WidthHeight // W, H
+
+  element?: HTMLElement // optional to assign evenlistener inputs on; you could put a default of 'body', that
+  // listens to some global numbers such as mouseX and mouseY locations
+
+  // Currently mixing HTML5 backend and THREE backend....organize into 2 types in the near future
+  camera?: any // dont want any three.js dependencies here
+  backendType: BackendType;// = BackendType::HTML5Backend;
+}
+
+// Canvas context is almost common for html canvas objects
+// Can be a THREE context too.
+class CanvasPassAlong {
+  protected context : CanvasContext;
+  constructor(context: CanvasContext) {
+    this.context = context;
+    console.log("Try: ", this.context);
+  }
+  // Temporary
+  cleanup() {
+
+  }
+  // following Actionable but actually deosn't override anything
+  action(t = -1) {
+
+  }
 }
 
 /*
@@ -132,6 +178,45 @@ class D_Rect {
   }
 }
 
+class D_Circle {
+  private hover: boolean;
+  private color: string;
+  public y: number;
+  public x: number;
+  private name: string;
+  private radius: number;
+  constructor({name="point", radius=8, color="#EE4433"}={}) {
+    // let's say this is the center point
+    this.x = 20;
+    this.y = 20;
+    this.name = name;
+    this.radius = radius;
+    this.color = color;
+    this.hover = false;
+  }
+  set(obj) {this.x = obj.x; this.y = obj.y;}
+  selected() {return this.hover;}
+  select() {
+    this.hover = true;
+  }
+
+  deselect() {
+    this.hover = false;
+  }
+  within(x,y) {
+    return Math.sqrt(Math.pow(x-this.x,2)+Math.pow(y-this.y,2)) < this.radius;
+  }
+
+  display(rcanvas: R_Canvas) {
+    rcanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius, 0, 360, false, this.color);
+    if(this.hover) {
+      rcanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius-2, 0, 360, false, "#ffffff");
+    }
+  }
+
+}
+
+// Can this be quackable?
 // D: Data only
 // Constant types
 class D_Point {
@@ -218,7 +303,7 @@ export type {
 
 export {
   D_Point,
-
+  D_Circle,
   multiDimensional,
   singleDimensional,
   NormalizePoint
@@ -233,5 +318,10 @@ export {
 
 export {
   QuackingV2,
-  QuackingV3
+  QuackingV3,
+  CanvasContext,
+  CanvasPassAlong,
+  Quackable,
+  QuackableV2,
+  QuackableV3
 }
