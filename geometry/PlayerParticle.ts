@@ -1,9 +1,9 @@
-import {CRay} from "./cray";
+import {CRay} from "./CRay";
 import {Cartesian2Polar, DEG2RAD, Polar2Cartesian} from "../functions/algebra";
 import * as THREE from 'three'
 import {ArrayAlloc, ForEachArrayIndex, ForEachArrayItem} from "../functions/functional";
 import {R_Canvas} from "../canvas/canvas";
-import {Boundary} from "./boundary";
+import {Boundary} from "./Boundary";
 import {diag} from "mathjs";
 
 class PlayerParticle {
@@ -14,19 +14,13 @@ class PlayerParticle {
 
   constructor() {
     this.pos = new THREE.Vector2(0, 0);
-    this.rays = [];
     this.rotation = 0;
     this.fov = 45;
-    //player just has a collection of rays to cast.
-    for (let i = this.rotation + -1*(this.fov/2); i < this.rotation + (this.fov/2); i += 1) {
-      let newRay = new CRay(this.pos, DEG2RAD * (i));
-      newRay.drawDebug = false;
-      this.rays.push(newRay);
-    }
+    this.updateFOV();
   }
 
   updateFOV() {
-    // regeenrate rays from scratch without considering player orientation???
+    // regenerate rays from scratch without considering player orientation???
     this.rays = [];
     for (let i = this.rotation + -1*(this.fov/2); i < this.rotation + (this.fov/2); i += 1) {
       let newRay = new CRay(this.pos, DEG2RAD * (i));
@@ -75,10 +69,9 @@ class PlayerParticle {
       let closest = Infinity;
       let closestPoint = null;
       ForEachArrayItem((boundary: Boundary) => {
-        let castRes = ray.cast(boundary);
-
-        if (castRes) {
-          let dist = castRes.distanceTo(this.pos);
+        let castResult = ray.cast(boundary);
+        if (castResult) {
+          let dist = castResult.distanceTo(this.pos);
           // to negate fish-eye more: get angle of the ray relative to direction of the camera
           // optionally make fish-eye unproject a boolean!
           const a = Cartesian2Polar(ray.direction) - this.rotation;
@@ -86,7 +79,7 @@ class PlayerParticle {
           dist *= Math.cos(a); // project rays's vector onto camera vector
           if (dist < closest) {
             closest = dist;
-            closestPoint = castRes;
+            closestPoint = castResult;
           }
         }
       }, args);
@@ -112,7 +105,6 @@ class PlayerParticle {
   }
 
   move(amount: number) {
-    // this.pos.ad
     this.pos.add(Polar2Cartesian(amount, this.rotation));
   }
 }

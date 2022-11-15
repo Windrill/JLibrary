@@ -15,7 +15,9 @@ interface QuackingV3 {
 
 // All this work is already done in CPP
 type Quackable = QuackingV2 | QuackingV3;
+// @ts-ignore
 const QuackableV2 = (x: Quackable): x is QuackingV2 => true;
+// @ts-ignore
 const QuackableV3 = (x: Quackable): x is QuackingV3 => true;
 
 interface WidthHeight {
@@ -30,10 +32,9 @@ enum BackendType {
 
 // Object
 interface CanvasContext {
-  ctx?: CanvasRenderingContext2D
-  canvasSize?: WidthHeight // W, H
-
-  element?: HTMLElement // optional to assign evenlistener inputs on; you could put a default of 'body', that
+  ctx: CanvasRenderingContext2D
+  canvasSize: WidthHeight // W, H
+  element: HTMLElement // optional to assign eventListener inputs on; you could put a default of 'body', that
   // listens to some global numbers such as mouseX and mouseY locations
 
   // Currently mixing HTML5 backend and THREE backend....organize into 2 types in the near future
@@ -49,12 +50,14 @@ class CanvasPassAlong {
     this.context = context;
     console.log("Try: ", this.context);
   }
+
   // Temporary
   cleanup() {
 
   }
+
   // following Actionable but actually deosn't override anything
-  action(t = -1) {
+  action(_t = -1) {
 
   }
 }
@@ -91,7 +94,6 @@ function MidPointToTopLeft(...args: number[]) {
   let addedReturns = C_ARRAY_COPY(args);
   C_ARRAY_ELEMENT_ADD(addedReturns, secondHalf);
   addedReturns.splice(halfLength);
-  // copiedPoints.spli
   return addedReturns;
 }
 
@@ -152,7 +154,6 @@ class D_Rect {
     ];
   }
 
-  // Todo: Standardize this into draw instead of show
   show(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.lineWidth = 0.5;
@@ -161,7 +162,7 @@ class D_Rect {
     ctx.stroke();
   }
 
-  contains(point: D_Point) {
+  contains(point: QuackingV2) {
     return (point.x >= (this.x)) &&
       (point.x <= (this.x + this.width)) &&
       (point.y >= (this.y)) &&
@@ -169,7 +170,7 @@ class D_Rect {
   }
 
   // If i want to test this function against javascript graphing engine, I just have an 'interactive'?
-  intersects(range: D_Rect) {
+  intersects(range: QuackingV2) {
     // first eval: left side of range rect is beyond (>) right side of this rect
     return !(range.x > this.x + this.width ||
       range.x < this.x - this.width ||
@@ -180,11 +181,11 @@ class D_Rect {
 
 class D_Circle {
   private hover: boolean;
-  private color: string;
+  private readonly color: string;
   public y: number;
   public x: number;
-  private name: string;
-  private radius: number;
+  private readonly name: string;
+  private readonly radius: number;
   constructor({name="point", radius=8, color="#EE4433"}={}) {
     // let's say this is the center point
     this.x = 20;
@@ -194,7 +195,7 @@ class D_Circle {
     this.color = color;
     this.hover = false;
   }
-  set(obj) {this.x = obj.x; this.y = obj.y;}
+  set(obj : QuackingV2) {this.x = obj.x; this.y = obj.y;}
   selected() {return this.hover;}
   select() {
     this.hover = true;
@@ -203,14 +204,14 @@ class D_Circle {
   deselect() {
     this.hover = false;
   }
-  within(x,y) {
+  within(x : number, y : number) {
     return Math.sqrt(Math.pow(x-this.x,2)+Math.pow(y-this.y,2)) < this.radius;
   }
 
-  display(rcanvas: R_Canvas) {
-    rcanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius, 0, 360, false, this.color);
+  display(rCanvas: R_Canvas) {
+    rCanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius, 0, 360, false, this.color);
     if(this.hover) {
-      rcanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius-2, 0, 360, false, "#ffffff");
+      rCanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius-2, 0, 360, false, "#ffffff");
     }
   }
 
@@ -224,6 +225,7 @@ class D_Point {
   y: number;
   z: number = 0;
   zValid: boolean = false;
+
   constructor(x : number, y : number, z: number|undefined=undefined) {
     this.x = x;
     this.y = y;
@@ -286,8 +288,8 @@ type NDPair = Pair | [number[], number[]];
 
 export {
   D_Rect
-
 }
+
 export type {
   ZeroOrOneD,
   OneDArray,
@@ -306,14 +308,13 @@ export {
   D_Circle,
   multiDimensional,
   singleDimensional,
-  NormalizePoint
-  ,
+  NormalizePoint,
   NormalizeX,
-  MidPointToD_Rect,
 
 }
 export {
-  MidPointToTopLeft
+  MidPointToTopLeft,
+  MidPointToD_Rect
 }
 
 export {
@@ -324,4 +325,8 @@ export {
   Quackable,
   QuackableV2,
   QuackableV3
+}
+
+export {
+  BackendType
 }

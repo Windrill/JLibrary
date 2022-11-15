@@ -1,7 +1,6 @@
 import {
   CanvasContext,
   CanvasPassAlong,
-  D_Point,
   D_Rect,
   NDArray,
   NormalizePoint,
@@ -64,10 +63,8 @@ class R_Canvas extends CanvasPassAlong {
       x: point.x + normDirection.x * magnitude,
       y: point.y + normDirection.y * magnitude
     };
-    this.cline(point.x, point.y, endOfLine.x, endOfLine.y,
-      Args[0]
-//{fillStyle: "#126cb4", debug: false, lineWidth: 2}
-    );
+    this.cline(point.x, point.y, endOfLine.x, endOfLine.y, Args[0]);
+    //{fillStyle: "#126cb4", debug: false, lineWidth: 2}
     let arrowFlapFromTrunk = magnitude / 5;
 
 
@@ -79,8 +76,7 @@ class R_Canvas extends CanvasPassAlong {
 
 
     let bottomFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y,
-      Args[0]
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y, Args[0]
       // {fillStyle: "#126cb4", debug: true, lineWidth: 3}
     );
   }
@@ -88,7 +84,7 @@ class R_Canvas extends CanvasPassAlong {
 // , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
   cpoint(point: QuackingV2, name = "",
     radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2,
-         anticlockwise = false, color = "#000000") {
+         _anticlockwise = false, color = "#000000") {
     this.context.ctx.beginPath();
     this.context.ctx.fillStyle = color;
     this.context.ctx.arc(point.x, point.y, radius, startAngle, endAngle);
@@ -100,7 +96,7 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
-  cpoint_offset(x,y, point) {
+  cpoint_offset(x: number,y: number, point: QuackingV2) {
     this.cpoint({x: point.x + x, y: point.y + y});
   }
 
@@ -146,8 +142,12 @@ class R_Canvas extends CanvasPassAlong {
     debug: false,
     lineWidth: 1
   }) {
+    if (debug) {
+      console.log("Debugging crect");
+    }
     this.context.ctx.beginPath();
     this.context.ctx.fillStyle = fillStyle;
+    this.context.ctx.lineWidth = lineWidth;
     this.context.ctx.rect(a, b, w, h);
     this.context.ctx.fill();
     this.context.ctx.closePath();
@@ -203,7 +203,7 @@ class R_Canvas extends CanvasPassAlong {
         i, drawRect.y - spacing / 2
       );
       console.assert((dimension2DOnly.length) > 0);
-      // hmm???
+
       let dimensionVals = Algebra.CMatrixMult(axisProj, [i, drawRect.y]);
       // hmmm, fail then fail all mechanism --> designate point of catch explicitly?
       if (!dimensionVals.length) return;
@@ -220,9 +220,14 @@ class R_Canvas extends CanvasPassAlong {
     }
   }
 
-  drawBoard(width, height, clear = true) {
-    if (clear)
+  drawBoard(clear = true) {
+    let width = this.context.canvasSize.W;
+    let height = this.context.canvasSize.H;
+
+    if (clear) {
       this.clear(new D_Rect(0, 0, width, height));
+    }
+
     this.context.ctx.fillStyle = this.styles.fillStyle;
     this.context.ctx.font = this.styles.fontStyle;
     this.cline(0, 5, width, 5);
@@ -260,8 +265,7 @@ class R_Canvas extends CanvasPassAlong {
     return degree * Math.PI / 180;
   }
 
-  crotate(d: number
-          // , point=[0,0]
+  crotate(d: number  // , point=[0,0]
   ) {
     let c = Math.cos(this.crad(d));
     let s = Math.sin(this.crad(d));

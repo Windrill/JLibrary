@@ -1,7 +1,6 @@
 import {D_Point, NDArray, OneDArray, Quackable, QuackableV2, QuackableV3, QuackingV2, QuackingV3} from "./structures";
 import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
-// import * as math from "mathjs";
 // import {matrix} from "mathjs";
 import multiply from "../vendor/math"
 
@@ -165,14 +164,14 @@ Array.prototype.reshape = function (rows, cols) {
 // Not tested yet
 const C_DOT = (a: Quackable, v: Quackable) => {
   let sum : number = 0;
-  ForEachObjectKey(a, (k) => {
+  ForEachObjectKey(a, (k : number) => {
     sum += a[k] * v[k];
   });
   return sum;
 };
 
 // Vector perpendicular to the plane tha contains A & B. Magnitude is magA * magB * sin(theta)
-const C_CROSS = (a: D_Point, b: D_Point) : D_Point => {
+const C_CROSS = (a: Quackable, b: Quackable) : Quackable => {
   if (!a.zValid || !b.zValid) {
     // console.log("Crossing 2D vector"); //, a, b, a.x * b.y, b.x * a.y);
     return new D_Point(

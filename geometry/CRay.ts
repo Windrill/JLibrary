@@ -2,6 +2,7 @@ import {R_Canvas} from "../canvas/canvas";
 import * as THREE from 'three'
 import {C_DOT, Polar2Cartesian} from "../functions/algebra";
 import {Boundary} from "./boundary";
+import {MapStatic} from "../../scantraverse/map";
 
 interface Drawable {
   draw(renderContext : R_Canvas) : void;
@@ -47,6 +48,7 @@ class CRay {
   }
 
 
+  // Line line collision?
   // if cast successful, draw a circle at the section.
   cast(boundary : Boundary) {
     const x1 = boundary.points[0].x;
