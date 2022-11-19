@@ -22,17 +22,22 @@ class Boundary {
   }
 
   getDirection() {
-    let subtracted = this.points[1].clone().sub(this.points[0]);
-    return subtracted;
+    return this.points[1].clone().sub(this.points[0]);
   }
 
   getOppoDirection() {
-    let subtracted = this.points[0].clone().sub(this.points[1]);
-    return subtracted;
+    return this.points[0].clone().sub(this.points[1]);
   }
 
   getNormal() {
     return C_CROSS(this.points[0], this.points[1]);
+  }
+}
+
+class Plane {
+
+  draw() {
+
   }
 }
 

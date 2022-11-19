@@ -1,7 +1,7 @@
 import {R_Canvas} from "../canvas/canvas";
 import * as THREE from 'three'
-import {C_DOT, Polar2Cartesian} from "../functions/algebra";
-import {Boundary} from "./boundary";
+import {C_DOT, Polar2Cartesian, RAD2DEG} from "../functions/algebra";
+import {Boundary} from "./Boundary";
 import {MapStatic} from "../../scantraverse/map";
 
 interface Drawable {
@@ -10,21 +10,32 @@ interface Drawable {
 
 class CRay {
   private pos: THREE.Vector2;
+  // For reference only
+  private radians : number;
   public direction: THREE.Vector2;
   // This is a circle of lines around ray -- if disabled, the rays will be 'invisible'
   public drawDebug: boolean;
 
-  constructor(pos : THREE.Vector2 = new THREE.Vector2(0, 0), theta : number = 1) {
+
+  constructor(pos : THREE.Vector2 = new THREE.Vector2(0, 0), radians : number = 1) {
     this.pos = pos;
-    let lolRandomP = Polar2Cartesian(1, theta);
-    this.direction = new THREE.Vector2(lolRandomP.x, lolRandomP.y);
+    this.radians = radians;
+    let relativeDirection = Polar2Cartesian(1, radians);
+    this.direction = new THREE.Vector2(relativeDirection.x, relativeDirection.y);
     this.drawDebug = true;
     // this.direction = new THREE.Vector2(0,1);
     // this.direction = new THREE.Vector2(0,-1);
   }
 
+  toString() {
+    return (`${(RAD2DEG * this.radians).toFixed(1)}°`);
+  }
+
   setPos(pos: THREE.Vector2) {
     this.pos = pos;
+  }
+  getPos() {
+    return this.pos;
   }
 
   setDirection(dir: THREE.Vector2) {

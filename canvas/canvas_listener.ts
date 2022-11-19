@@ -7,7 +7,6 @@
 // Listener is for windows events, and document events
 
 import {CanvasContext, CanvasPassAlong} from "../functions/structures";
-import {Actionable} from "../../general";
 import {ForEachObjectKey} from "../functions/functional";
 
 class Listener extends CanvasPassAlong {
@@ -22,8 +21,11 @@ class Listener extends CanvasPassAlong {
     pressed: boolean;
   }
 
+  element : Element;
+
   constructor(context: CanvasContext) {
     super(context);
+    this.element = context.element;
     // Events:
     /*
     pointerdown, pointermove, pointerup, mouseout
@@ -36,8 +38,12 @@ class Listener extends CanvasPassAlong {
     this.lambdas = {};
   }
 
+  setElement(element : Element) {
+    this.element = element;
+  }
+
   getElement() {
-    return this.context.element;
+    return this.element;
   }
 
   // need to make into array

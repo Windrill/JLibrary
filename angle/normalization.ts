@@ -1,4 +1,5 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
+import {Quackable} from "../functions/structures";
 
 let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   let period = to - from;
@@ -24,13 +25,7 @@ let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   return angle;
 }
 
-// vector2
-// angle in between 2 vectors
-let GetAngleDiff2D = (vec1: number[], vec2: number[]) => {
-  // first you orthogonize the 2 angles, then you get the angle
-  let angleRes = C_ARRAY_COPY(vec2);
-  C_ARRAY_ELEMENT_SUB(angleRes, vec1);
-
+let GetAngleDegree = (angleRes: number[]) => {
   let angleDeg = 1;
   let y = angleRes[1];
   let x = angleRes[0];
@@ -39,12 +34,23 @@ let GetAngleDiff2D = (vec1: number[], vec2: number[]) => {
     angleDeg = NormalizeWithinPeriod(Math.atan2(y, x) / 3.14 * 180, 0, 360) / 360;
   }
   return angleDeg;
-  // then add angle1's angle to??
+};
 
+
+// vector2
+let AngleDiff2D = (vec1: number[], vec2: number[]) => {
+  // first you orthogonize the 2 angles, then you get the angle
+  let angleRes = C_ARRAY_COPY(vec2);
+  C_ARRAY_ELEMENT_SUB(angleRes, vec1);
+
+  return GetAngleDegree(angleRes);
+  // then add angle1's angle to??
 }
 
 
 
 export {
-  NormalizeWithinPeriod
+  NormalizeWithinPeriod,
+  GetAngleDegree,
+  AngleDiff2D
 }

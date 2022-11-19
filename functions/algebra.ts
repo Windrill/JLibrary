@@ -8,10 +8,10 @@ import multiply from "../vendor/math"
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
-function Polar2Cartesian(r: number, theta: number) : QuackingV2 {
+function Polar2Cartesian(r: number, radians: number) : QuackingV2 {
   return {
-    x: r * Math.cos(theta),
-    y: r * Math.sin(theta)
+    x: r * Math.cos(radians),
+    y: r * Math.sin(radians)
   }
 }
 

@@ -48,7 +48,7 @@ class CanvasPassAlong {
   protected context : CanvasContext;
   constructor(context: CanvasContext) {
     this.context = context;
-    console.log("Try: ", this.context);
+    // console.log("Try: ", this.context);
   }
 
   // Temporary
@@ -97,7 +97,7 @@ function MidPointToTopLeft(...args: number[]) {
   return addedReturns;
 }
 
-function MidPointToD_Rect(...args: number[]) {
+function MidPointToBottomLeft(...args: number[]) {
   let halfLength = args.length / 2;
   let d_rect_params = [];
   for (let i = 0; i < halfLength; i++) {
@@ -107,11 +107,11 @@ function MidPointToD_Rect(...args: number[]) {
   }
 
   for (let i = 0; i < halfLength; i++) {
-    d_rect_params.push(
-      args[i] + args[halfLength + i] / 2
+    d_rect_params.push(args[halfLength + i]
     );
   }
-  return new D_Rect(...d_rect_params);
+  return d_rect_params;
+  // return new D_Rect(...d_rect_params);
 }
 
 class D_Rect {
@@ -314,7 +314,7 @@ export {
 }
 export {
   MidPointToTopLeft,
-  MidPointToD_Rect
+  MidPointToBottomLeft
 }
 
 export {
