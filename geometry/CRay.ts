@@ -74,7 +74,6 @@ class CRay {
 
     const div = (x1 - x2) * (y3 - y4) - ((y1 - y2) * (x3 - x4));
     if (div == 0) return null;
-    //
 
     const tNum = (x1 - x3) * (y3 - y4) - ((y1 - y3) * (x3 - x4));
     const t = tNum / div;

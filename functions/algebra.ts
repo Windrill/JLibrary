@@ -198,7 +198,7 @@ const C_OBJ_ELEMENT_MINUS = (a: D_Point, b: D_Point) => {
   return {x: a.x - b.x, y: a.y - b.y};
 }
 
-function C_ARRAY_COPY(a: any[]): any[] {
+function C_ARRAY_COPY<Type>(a: Type[]): Type[] {
   let res = [];
   for (let i = 0; i < a.length; i++) {
     res.push(a[i]);
@@ -206,21 +206,21 @@ function C_ARRAY_COPY(a: any[]): any[] {
   return res;
 }
 
-function C_ARRAY_ELEMENT_ADD(a: any[], b: any[]) {
+function C_ARRAY_ELEMENT_ADD(a: number[], b: number[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] += b[i];
   }
   return a;
 }
 
-function C_ARRAY_ELEMENT_SUB(a: any[], b: any[]) {
+function C_ARRAY_ELEMENT_SUB(a: number[], b: number[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] -= b[i];
   }
   return a;
 }
 
-function C_ARRAY_ELEMENT_MULT(a: any[], b: any[]) {
+function C_ARRAY_ELEMENT_MULT(a: number[], b: number[]) {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     a[i] *= b[i];
   }

@@ -1,13 +1,16 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SCALE} from "./algebra";
 import {R_Canvas} from "../canvas/canvas";
+import {arg} from "mathjs";
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
+  [index: number]: any
   x: number,
   y: number
 }
 
 interface QuackingV3 {
+  [index: number]: any
   x: number,
   y: number,
   z: number
@@ -78,6 +81,18 @@ converts
  |          | |
  |----------| v
  */
+
+type boxTuple = [number, number, number, number];
+
+
+function MidPointToTopLeftBoxTuple(...args: boxTuple) : boxTuple {
+  let addedReturns = MidPointToTopLeft(...args);
+  let defaults = [0, 0, 0, 0]
+  let firstFour : number[] = [...addedReturns, ...defaults];
+  firstFour = firstFour.slice(0, 4);
+  return [firstFour[0], firstFour[1], firstFour[2], firstFour[3]];
+}
+
 /**
  * Expects the first half of parameters to be specifying the midpoint, and the second half specifying the size
  * @param args
@@ -85,16 +100,17 @@ converts
  */
 // haven't used before, lol, looks very eveil
 // 100,100,20,20 --> 80,80? or should have been 90,90-110,110?
-function MidPointToTopLeft(...args: number[]) {
+function MidPointToTopLeft(...args: number[]) : number[] {
   let halfLength = args.length / 2;
-  let secondHalf = C_ARRAY_COPY(args);
-  secondHalf.splice(halfLength);
-  C_ARRAY_ELEMENT_SCALE(secondHalf, -1);
-
-  let addedReturns = C_ARRAY_COPY(args);
-  C_ARRAY_ELEMENT_ADD(addedReturns, secondHalf);
-  addedReturns.splice(halfLength);
-  return addedReturns;
+  let returns = C_ARRAY_COPY(args);
+  for (let i = 0; i < halfLength; i++) {
+    if (i < halfLength) {
+      returns[i] -= returns[i + halfLength] / 2;
+    } else {
+      returns[i] = returns[i - halfLength] + args[i];
+    }
+  }
+  return returns;
 }
 
 function MidPointToBottomLeft(...args: number[]) {
@@ -111,7 +127,6 @@ function MidPointToBottomLeft(...args: number[]) {
     );
   }
   return d_rect_params;
-  // return new D_Rect(...d_rect_params);
 }
 
 class D_Rect {
@@ -221,6 +236,7 @@ class D_Circle {
 // D: Data only
 // Constant types
 class D_Point {
+  [index: number]: any
   x: number;
   y: number;
   z: number = 0;
@@ -240,7 +256,6 @@ class D_Point {
 
 }
 
-// normalize as an array
 function NormalizeX(...args: number[]): number[] {
   let mag = 0;
   for (let i = 0; i < args.length; i++) {
@@ -314,7 +329,8 @@ export {
 }
 export {
   MidPointToTopLeft,
-  MidPointToBottomLeft
+  MidPointToBottomLeft,
+  MidPointToTopLeftBoxTuple
 }
 
 export {

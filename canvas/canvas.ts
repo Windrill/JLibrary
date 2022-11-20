@@ -53,10 +53,13 @@ class R_Canvas extends CanvasPassAlong {
   // THREE.Matrix4();
   // }
 
-  // what does direction represent??? i think just a ratio.... lol, can be forced to represent magnitude too,
-  // but it's just that magnitude didnt need to be so much 'implied'
-  // pass down
-  // 1 is down, -1 is up
+  /**
+   * 1 is down, -1 is up
+   * @param point: from location
+   * @param direction: a ratio, magnitude is not referenced in this direction
+   * @param magnitude
+   * @param Args
+   */
   carrow(point: QuackingV2, direction: QuackingV2, magnitude: number, ...Args: any) {
     let normDirection = NormalizePoint(direction);
     let endOfLine = {
@@ -228,19 +231,20 @@ class R_Canvas extends CanvasPassAlong {
       this.clear(new D_Rect(0, 0, width, height));
     }
 
-    this.context.ctx.fillStyle = this.styles.fillStyle;
-    this.context.ctx.font = this.styles.fontStyle;
-    this.cline(0, 5, width, 5);
-    this.cline(5, 0, 5, height);
+    // this.context.ctx.fillStyle = this.styles.fillStyle;
+    // this.context.ctx.strokeStyle = this.styles.strokeStyle;
+    // this.context.ctx.font = this.styles.fontStyle;
+    this.cline(0, 5, width, 5, this.styles);
+    this.cline(5, 0, 5, height, this.styles);
     for (let i = 0; i <= width; i += 40) {
       // X Axis
-      this.cline(i, 5, i, 10);
+      this.cline(i, 5, i, 10, this.styles);
       this.context.ctx.fillText(String(i), i - 10, 23);
     }
 
     for (let i = 0; i <= height; i += 40) {
       // y axis
-      this.cline(5, i, 10, i);
+      this.cline(5, i, 10, i, this.styles);
       this.context.ctx.fillText(String(i), 13, i + 5);
     }
   }
