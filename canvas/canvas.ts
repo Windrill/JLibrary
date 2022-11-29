@@ -8,6 +8,7 @@ import {
 } from "../functions/structures";
 import { ColorConversions } from "../tools/color_conversions"
 import {Algebra, DEG2RAD} from "../functions/algebra";
+import {DrawSettings} from "./draw_settings";
 
 
 // Options settings....
@@ -96,15 +97,19 @@ class R_Canvas extends CanvasPassAlong {
     }
   }
 
-  cpoint(point: QuackingV2, name = "",
-    radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2,
-         _anticlockwise = false, color = "#000000") {
+  // const DefaultCircleDrawSettings : DrawSettings = {
+  //
+  // };
+  // cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
+// , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
+  cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
+
     this.context.ctx.beginPath();
-    this.context.ctx.fillStyle = color;
-    this.context.ctx.arc(point.x, point.y, radius, startAngle, endAngle);
+    this.context.ctx.fillStyle = drawSettings.color;
+    this.context.ctx.arc(point.x, point.y, drawSettings.radius, drawSettings.startAngle, drawSettings.endAngle);
     this.context.ctx.fill();
-    if (name != "") {
-      this.write(name, point.x - 10, point.y - 10);
+    if (drawSettings.name != "") {
+      this.write(drawSettings.name, point.x - 10, point.y - 10);
     }
 
     this.context.ctx.closePath();

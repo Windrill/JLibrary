@@ -5,13 +5,11 @@ import {
   OneDArray,
   Quackable,
   QuackableV3,
-  QuackingV2, QuackingV3
+  QuackingV2
 } from "./structures";
 import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, ForEachObjectItem, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
-// import {matrix} from "mathjs";
-import multiply from "../vendor/math"
-import {MathArray, qr} from "mathjs";
+import {multiply, MathArray, qr} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
