@@ -2,18 +2,44 @@ import * as THREE from 'three'
 import {R_Canvas} from "../canvas/canvas";
 import {ORG2} from "../r_three";
 import {C_CROSS} from "../functions/algebra";
+import {Listener} from "../canvas/canvas_listener";
+import {CanvasContext} from "../functions/structures";
+import {ForEachArrayItem} from "../functions/functional";
+
+// For example, the midpoint on which boundary line will be computed & redrawn upon.
+type GenericContext = {
+  [index: string]: any;
+};
 
 class CObject {
+  // Familiar name.
   public name : string
+  // Save your mousedown listen functions' items here
+  public contextObject : GenericContext;
+  // Component manager
+
+  addComponent(canvas: CanvasContext, lambdaSet: [string, (...args: any) => any][]) {
+    // unreal has it as a tree but you can have it as a list
+    let listen = new Listener(canvas);
+    ForEachArrayItem((lamb: [string, (...args: any) => any])=> {
+      listen.setListenFunction(lamb[0], lamb[1], false);
+    }, lambdaSet);
+
+    // I want a context function to come with this that you can modify for each object.
+
+    return listen;
+  }
+
   constructor() {
     this.name = "";
+    this.contextObject = {};
   }
 }
 // jlibrary->rthree
 // why boundary is separate from ray??
 // totally a static object, no la it's just the static thing that a ray casts against, boundaries
 // done't need to cast anything they're the objects inside a map, so always use this
-class Boundary extends CObject{
+class Boundary extends CObject {
   points : THREE.Vector2[];
   constructor(p1 = ORG2, p2 = ORG2) {
     super();
@@ -32,12 +58,20 @@ class Boundary extends CObject{
     });
   }
 
+  drawDirection(canvas : R_Canvas) {
+    canvas.carrow(this.points[1], this.getDirection(), this.getLength());
+  }
+
   getDirection() {
     return this.points[1].clone().sub(this.points[0]);
   }
 
   getOppoDirection() {
     return this.points[0].clone().sub(this.points[1]);
+  }
+
+  getLength() {
+    return this.getDirection().length();
   }
 
   getNormal() {
@@ -57,5 +91,6 @@ class Plane {
 }
 
 export {
-  Boundary
+  Boundary,
+  CObject
 }

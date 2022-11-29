@@ -1,14 +1,23 @@
-import {D_Point, NDArray, OneDArray, Quackable, QuackableV2, QuackableV3, QuackingV2, QuackingV3} from "./structures";
+import {
+  D_Line,
+  D_Point,
+  NDArray,
+  OneDArray,
+  Quackable,
+  QuackableV3,
+  QuackingV2, QuackingV3
+} from "./structures";
 import {utils} from "../r_three";
-import {Accumulator, ForEachArrayIndex, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
+import {Accumulator, ForEachArrayIndex, ForEachObjectItem, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
 // import {matrix} from "mathjs";
 import multiply from "../vendor/math"
+import {MathArray, qr} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
-function Polar2Cartesian(r: number, radians: number) : QuackingV2 {
+function Polar2Cartesian(r: number, radians: number): QuackingV2 {
   return {
     x: r * Math.cos(radians),
     y: r * Math.sin(radians)
@@ -20,12 +29,74 @@ function Cartesian2Polar(xy: QuackingV2) {
   return Math.atan2(xy.y, xy.x);
 }
 
-// can't do this 'specializatio'n
+// can't do this 'specialization'
 // type ProjectArray = number[][2];
 
 class Algebra {
+  static OrthoNormal() {
+    let c1: //math.
+      MathArray = [
+      [2, 3, 1],
+      [2, 4, 1]];
+    console.log(qr(c1));
+
+  }
+
+  //matt : math.Matrix, mat : number[][]
+  // static OrthoNormal() {
+  //   // but what does getting orthonormal and QR yield??
+  //   let c1 : math.MathArray = [[
+  //     2,2,1
+  //   ],
+  //   [3,4,1]];
+  //   console.log(math.qr(c1));
+  // }
+  //   new math.Matrix(//[
+  //   );
+  // c1.resize([3,1]);
+
+//     c1.set(
+// [
+//       mat[0][0],
+//       mat[0][1],
+//       mat[0][2]]
+//     )
+  //    ]
+
+  // let c2 = [
+  //   mat[1][0],
+  //   mat[1][1],
+  //   mat[1][2]
+  // ];
+  // let c2hat = (C_DOT(c2, c1) / (C_DOT(c1, c1))).mult(c1);
+
+  static GetRad(point: Quackable) {
+    return Math.atan2(point.y, point.x);
+  }
+
+  // intersect to ...... <-- how to choose quadrants?
+
+  /**
+   * Frame of reference relative to first point
+   * @param fromPoint First point
+   * @param toPoint Gets to second point. Basically subtracting two degrees....
+   * @constructor
+   */
+  // Must be between 2 intersecting lines, and they are centered around 0 already. Which means this only calculates first quadrant results.
+  static UnprojectP(fromPoint: Quackable, toPoint: Quackable) {
+    // retrieve degrees from 2 angles, from, and to.
+    return Algebra.GetRad(toPoint) - Algebra.GetRad(fromPoint);
+  }
+
   // Project in terms of polar coordinates, returns cartesian
-  static ProjectP(baseLineVector: QuackingV2 | QuackingV3, magnitude: number, projectAngle: number) {
+  /**
+   * Only 1 frame of reference
+   * @param baseLineVector: angle where 0 is. if you want a default it's (1, 0)
+   * @param magnitude
+   * @param projectAngle
+   * @constructor
+   */
+  static ProjectP<T extends QuackingV2>(baseLineVector: T, magnitude: number, projectAngle: number): QuackingV2 {
     // baseLine's radian angle + projectAngle's radian angle --> new angle --> convert to cartesian
     let twoFrameAngle = Math.atan2(baseLineVector.y, baseLineVector.x) + DEG2RAD * (projectAngle);
     return Polar2Cartesian(magnitude, twoFrameAngle);
@@ -34,9 +105,9 @@ class Algebra {
   // -4, 3 --> 0, 1 (multiply by range, actually this is not offset this is range)
   // just projecting on the 3rd axis.
   // real offset abt x point....
-  static ProjectAxis(point: OneDArray, renderDimensions: OneDArray, _offset: OneDArray = [0,0]) {
+  static ProjectAxis(point: OneDArray, renderDimensions: OneDArray, _offset: OneDArray = [0, 0]) {
     let renderSize = renderDimensions[1] - renderDimensions[0];
-    let projectionZ = (point[2]-renderDimensions[0]) / renderSize;
+    let projectionZ = (point[2] - renderDimensions[0]) / renderSize;
     // console.log(projectionZ , "(", renderSize, point[2], renderDimensions[0]);
 
     let fullPoints = C_ARRAY_ELEMENT_SCALE(C_ARRAY_COPY(point), projectionZ);
@@ -65,7 +136,7 @@ class Algebra {
    *
    */
   //location: OneDArray,
-  static ScalarProjection(varRange: NDArray,locationRange: NDArray, _debug: boolean = false): NDArray {
+  static ScalarProjection(varRange: NDArray, locationRange: NDArray, _debug: boolean = false): NDArray {
     let minProjectability = Math.min(locationRange.length, varRange.length); //Math.min(location.length,
     // console.log("projecting in : ",minProjectability, " dims", location);
     // TODO Interactive console for this
@@ -106,7 +177,7 @@ class Algebra {
   } // end Project
 
   // blurry multiplication
-  static CMatrixMult(matrixData : NDArray, location : OneDArray) : OneDArray {
+  static CMatrixMult(matrixData: NDArray, location: OneDArray): OneDArray {
     let locationWScale: OneDArray = [...location];
     // ???? hacky. basically i have location=3 coordinates and dimension = 2
     if (matrixData[0].length > locationWScale.length) {
@@ -121,15 +192,15 @@ class Algebra {
   }
 
   // ????? why cant you unionize it. find the innermost 1D array, and merge them
-  static Average(dims : OneDArray) {
+  static Average(dims: OneDArray) {
     let arraySum = Accumulator(FUNCAccumulatorSum, dims);
     return arraySum / dims.length;
   }
 
   // lol, useless function, only called by 1 party
-  static GetMidpoint(dimensions : NDArray) : OneDArray {
-    let midpoint : number[] = [];
-    ForEachArrayIndex((i : number)=> {
+  static GetMidpoint(dimensions: NDArray): OneDArray {
+    let midpoint: number[] = [];
+    ForEachArrayIndex((i: number) => {
       midpoint.push(Algebra.Average(dimensions[i]));
     }, dimensions);
     return midpoint;
@@ -163,32 +234,40 @@ Array.prototype.reshape = function (rows, cols) {
 
 // Not tested yet
 const C_DOT = (a: Quackable, v: Quackable) => {
-  let sum : number = 0;
-  ForEachObjectKey(a, (k : number) => {
-    sum += a[k] * v[k];
+  let sum: number = 0;
+  let i = 0;
+  let reserveSpace: number[] = [];
+  ForEachObjectItem(a, (k: number) => {
+    reserveSpace.push(k);
+  });
+  ForEachObjectItem(v, (k: number) => {
+    if (i > reserveSpace.length)
+      return;
+    reserveSpace[i] *= k;
+    sum += reserveSpace[i];
+    i++;
   });
   return sum;
 };
 
 // Vector perpendicular to the plane tha contains A & B. Magnitude is magA * magB * sin(theta)
-const C_CROSS = (a: Quackable, b: Quackable) : Quackable => {
-  if (!a.zValid || !b.zValid) {
-    // console.log("Crossing 2D vector"); //, a, b, a.x * b.y, b.x * a.y);
+const C_CROSS = (a: Quackable, b: Quackable): Quackable => {
+  if (QuackableV3(a) && QuackableV3(b)) {
     return new D_Point(
-      a.x * b.y,
-      b.x * a.y);
+      a.y * b.z - a.z * b.y,
+      a.z * b.x - a.x * b.z,
+      a.x * b.y - a.y * b.x
+    );
   }
+  return new D_Point(
+    a.x * b.y,
+    b.x * a.y);
 
   // console.log(`debugging:
   //   ${a.y*b.z} - ${a.z*b.y},
   //   ${a.z*b.x} - ${a.x*b.z},
   //   ${a.x*b.y}-${a.y*b.x}`);
-
-  return new D_Point(
-    a.y*b.z - a.z*b.y,
-    a.z*b.x - a.x*b.z,
-    a.x*b.y-a.y*b.x
-  );
+  // !a.zValid || !b.zValid
 };
 
 const C_DIST = (a: QuackingV2, v: QuackingV2) => {

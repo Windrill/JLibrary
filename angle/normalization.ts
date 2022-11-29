@@ -38,12 +38,18 @@ let GetAngleRadian = (angleRes: number[]) => {
   return angleDeg;
 };
 
-
-let AngleDiff2D = (vec1: number[], vec2: number[]) => {
-  // first you orthogonize the 2 angles, then you get the angle
+/**
+ * For degrees that are based on origin point.
+ * @param vec1
+ * @param vec2
+ * @constructor
+ */
+//this is likse a global angle deg but i need the angle between 2 vectors not this......how 2 differentiate?
+let RadDiff2D = (vec1: number[], vec2: number[]) => {
+  // first you orthogonal the 2 angles, then you get the angle
   let angleRes = C_ARRAY_COPY(vec2);
   C_ARRAY_ELEMENT_SUB(angleRes, vec1);
-
+console.log(vec1, vec2, angleRes);
   return GetAngleRadian(angleRes);
   // then add angle1's angle to??
 }
@@ -52,5 +58,5 @@ let AngleDiff2D = (vec1: number[], vec2: number[]) => {
 export {
   NormalizeWithinPeriod,
   GetAngleRadian,
-  AngleDiff2D
+  RadDiff2D
 }

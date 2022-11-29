@@ -6,7 +6,8 @@ import {
   NormalizePoint,
   QuackingV2
 } from "../functions/structures";
-import {Algebra} from "../functions/algebra";
+import { ColorConversions } from "../tools/color_conversions"
+import {Algebra, DEG2RAD} from "../functions/algebra";
 
 
 // Options settings....
@@ -74,17 +75,27 @@ class R_Canvas extends CanvasPassAlong {
     // let flapHorizontalLength = Math.tan(DEG2RAD * 40) * arrowFlapFromTrunk;
     // how to draw this line perpendicular from the main line
     let topFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, 40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, Args[0]
-    );
-
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, Args[0]);
 
     let bottomFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
     this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y, Args[0]
-      // {fillStyle: "#126cb4", debug: true, lineWidth: 3}
     );
   }
 
-// , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
+  // draw such that there are angle/degree markings around the circle
+  // direction = reference 'forward' direction
+  cPlate(point: QuackingV2, direction : QuackingV2, magnitude : number = 10) {
+    for (let i = 0; i < 360; i += 30) {
+      let tick = Algebra.ProjectP(direction, magnitude, i);
+      let col = ColorConversions.rgbToHex(40, 100+i/15, i/2);
+      let lw = 1;
+      if (i == 0) {
+        lw = 7;
+      }
+      this.clineo(point, {x: point.x + tick.x, y: point.y + tick.y}, {fillStyle: col, debug: false, lineWidth: lw});
+    }
+  }
+
   cpoint(point: QuackingV2, name = "",
     radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2,
          _anticlockwise = false, color = "#000000") {
@@ -103,7 +114,8 @@ class R_Canvas extends CanvasPassAlong {
     this.cpoint({x: point.x + x, y: point.y + y});
   }
 
-  cngon(listOfPoints: any[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
+  // Change to points.
+  cngon(listOfPoints: number[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
     listOfPoints.push(listOfPoints[0]);
     listOfPoints.push(listOfPoints[1]);
     if (debug) {
@@ -119,9 +131,19 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
+  clineo(first: QuackingV2, second: QuackingV2, {fillStyle, debug, lineWidth} = {
+    fillStyle: "#000000",
+    debug: false,
+    lineWidth: 1
+  }) {
+  return this.cline(first.x, first.y, second.x, second.y, {fillStyle, debug, lineWidth});
+  }
+
+  // Slowly remove this
   // TODO: Organize styles and document, fix it such that these options are optional
   // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
-  cline(a: number, b: number, x: number, y: number, {fillStyle, debug, lineWidth} = {
+  // cline<T>(a: T, b: T, x: T, y: T, {fillStyle, debug, lineWidth} = {
+    cline(a: number, b: number, x: number, y: number, {fillStyle, debug, lineWidth} = {
     fillStyle: "#000000",
     debug: false,
     lineWidth: 1
@@ -140,6 +162,7 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
+  // Change this too
   crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = {
     fillStyle: "#000000",
     debug: false,
@@ -157,6 +180,7 @@ class R_Canvas extends CanvasPassAlong {
 
   }
 
+  // ?? See MidPointToBottomLeft, structures.ts
   cline_offset(a: any, b: any, x: any, y: any) {
     this.cline(a, b, x + a, y + b);
   }
@@ -265,14 +289,10 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.restore();
   }
 
-  crad(degree: number) {
-    return degree * Math.PI / 180;
-  }
-
-  crotate(d: number  // , point=[0,0]
+  crotate(degrees: number  // , point=[0,0]
   ) {
-    let c = Math.cos(this.crad(d));
-    let s = Math.sin(this.crad(d));
+    let c = Math.cos(DEG2RAD * degrees);
+    let s = Math.sin(DEG2RAD * degrees);
 
     // @ts-ignore
     return math.matrix([[c, s, 0], [-s, c, 0], [0, 0, 1]]);

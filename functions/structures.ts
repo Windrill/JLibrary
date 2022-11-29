@@ -4,13 +4,13 @@ import {arg} from "mathjs";
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
-  [index: number]: any
+  // [index: number]: any
   x: number,
   y: number
 }
 
 interface QuackingV3 {
-  [index: number]: any
+  // [index: number]: any
   x: number,
   y: number,
   z: number
@@ -128,6 +128,11 @@ function MidPointToBottomLeft(...args: number[]) {
   }
   return d_rect_params;
 }
+
+type D_Line = {
+  fromPoint: Quackable;
+  toPoint : Quackable;
+};
 
 class D_Rect {
   x: number;
@@ -341,6 +346,9 @@ export {
   Quackable,
   QuackableV2,
   QuackableV3
+}
+export type {
+  D_Line
 }
 
 export {

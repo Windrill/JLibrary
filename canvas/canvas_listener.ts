@@ -60,7 +60,7 @@ class Listener extends CanvasPassAlong {
       return;
     }
     // for (let lam in Object.keys(this.lambdas)) {
-    ForEachObjectKey((lam) => {
+    ForEachObjectKey((lam : string) => {
       let element = this.context.element;
       console.log("Cleanup lambda ", this.lambdas, lam, this.lambdas[lam]);
       element.removeEventListener(lam, this.lambdas[lam].func, this.lambdas[lam].propagate);

@@ -5,6 +5,7 @@ import {ArrayAlloc, ForEachArrayIndex, ForEachArrayItem} from "../functions/func
 import {R_Canvas} from "../canvas/canvas";
 import {Boundary} from "./Boundary";
 import {diag} from "mathjs";
+import {Quack2Vector2} from "./Conversions";
 
 class PlayerParticle {
   public pos: THREE.Vector2;
@@ -14,6 +15,7 @@ class PlayerParticle {
 
   constructor() {
     this.pos = new THREE.Vector2(0, 0);
+    this.rays = [];
     this.rotation = 0;
     this.fov = 45;
     this.updateFOV();
@@ -60,7 +62,7 @@ class PlayerParticle {
   }
 
   // Let castBoundaries return the point, and the distance
-  castBoundaries(...args: Boundary[]) {
+  castBoundaries(...args: Boundary[]) : [THREE.Vector2[], number[]] {
     let allRes: THREE.Vector2[] = [];
     let allDistances: number[] = ArrayAlloc(this.rays.length);
     // Need to be for each ray look at the nearest boundary
@@ -105,7 +107,7 @@ class PlayerParticle {
   }
 
   move(amount: number) {
-    this.pos.add(Polar2Cartesian(amount, this.rotation));
+    this.pos.add(Quack2Vector2(Polar2Cartesian(amount, this.rotation)));
   }
 }
 

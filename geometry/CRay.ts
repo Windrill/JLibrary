@@ -8,6 +8,7 @@ interface Drawable {
   draw(renderContext : R_Canvas) : void;
 }
 
+// Need CRay Data Struct before you have the object. Same for Line
 class CRay {
   private pos: THREE.Vector2;
   // For reference only
@@ -54,7 +55,7 @@ class CRay {
   }
 
   // overload??/
-  castObject(obj : MapStatic) {
+  castObject(_obj : MapStatic) {
 
   }
 
