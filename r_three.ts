@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import {D_Point, OneDArray, QuackingV2, QuackingV3} from "./functions/structures";
+import {OneDArray, QuackingV2, QuackingV3} from "./functions/structures";
 import {Vector2, Vector3} from "three";
 // Also you might want some common variables
 const ORG2 = new Vector2(0, 0);
@@ -35,22 +35,22 @@ class utils {
   }
 
   // make a vector
-  static av(arr: OneDArray) {
+  static arrayToVector(arr: OneDArray) {
     return {x: arr[0], y: arr[1]};
   };
 
-  static uv(o: QuackingV2) {
+  static vectorToArray(o: QuackingV2) {
     return [o.x, o.y];
   }
 
   // subtract array 2 from array 1
-  static sv(arr1: number[], arr2: number[]) {
+  static subtractVector(arr1: number[], arr2: number[]) {
     return arr1.map(function (item, index) {
       return item - arr2[index];
     });
   }
 
-  static angleBetweenVectors(ax, ay, bx, by) {
+  static angleBetweenVectors(ax: number, ay: number, bx: number, by: number) {
     let magA = Math.sqrt(ax * ax + ay * ay);
     let magB = Math.sqrt(by * by + bx * bx);
     let magAmagB = magA * magB;
@@ -72,7 +72,7 @@ class utils {
   // if c is left of ab
   static isLeft(a: QuackingV2, b: QuackingV2, c: QuackingV2, debug = false) {
     if (debug) {
-      console.log(`${utils.uv(a)}, ${utils.uv(b)}, ${utils.uv(c)}`);
+      console.log(`${utils.vectorToArray(a)}, ${utils.vectorToArray(b)}, ${utils.vectorToArray(c)}`);
     }
     return ((b.x - a.x) * (c.y - a.y) - ((b.y - a.y) * (c.x - a.x))) > 0;
   }
@@ -89,7 +89,7 @@ class utils {
     m.set(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11], a[12], a[13], a[14], a[15]);
   }
 
-  static rotateAboutWorldAxis(object, axis, theta: number) {
+  static rotateAboutWorldAxis(object : THREE.Object3D, axis : THREE.Vector3, theta: number) {
     let rotationMatrix = new THREE.Matrix4();
     rotationMatrix.makeRotationAxis(axis.normalize(), theta);
     let currentPos = new THREE.Vector4(object.position.x, object.position.y, object.position.z, 1);
@@ -115,7 +115,7 @@ class utils {
     return mat;
   }
 
-  static m_make(dims) {
+  static m_make(dims : number[]) {
     let res = new Array();
     if (!dims.length) return 0;
     let dim = dims[0];
@@ -128,7 +128,7 @@ class utils {
   }
 
   // Apply function for each element traversed
-  static m_traverse(func, dim, input = []) {
+  static m_traverse(func :(_:number[])=>void, dim : number[], input : number[] = []) {
     if (!Array.isArray(dim) || dim.length <= 0) {
       return;
     }
@@ -147,7 +147,7 @@ class utils {
     }
   }
 
-  static m_getEle(array, indices) {
+  static m_getEle(array: any[] , indices : number[]) : number[] {
     if (indices.length == 0) {
       return array;
     } else {
@@ -155,7 +155,7 @@ class utils {
     }
   }
 
-  static m_setEle(arr, idx, ele) {
+  static m_setEle(arr: number[] | any[], idx: number[], ele: number) {
     if (idx.length == 1) {
       arr[idx[0]] = ele;
     } else {
@@ -164,7 +164,7 @@ class utils {
   }
 
   // trans = utils.m_transpose([[8,7,3],[4,5,6]]);
-  static m_transpose(input) {
+  static m_transpose(input: any[] | number) {
     if (Number.isFinite(input)) {
       return [input];
     }
@@ -191,6 +191,7 @@ class utils {
         let shift = idx.slice(1);
         shift.push(idx[0]);
         // set the shifted coordinates to input[idx_coords]
+        //@ts-ignore
         utils.m_setEle(transposedMatrix, shift, utils.m_getEle(input, idx));
       }, dimensions);
       return transposedMatrix;

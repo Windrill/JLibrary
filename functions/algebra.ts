@@ -1,5 +1,4 @@
 import {
-  D_Line,
   D_Point,
   NDArray,
   OneDArray,
@@ -8,8 +7,11 @@ import {
   QuackingV2
 } from "./structures";
 import {utils} from "../r_three";
-import {Accumulator, ForEachArrayIndex, ForEachObjectItem, ForEachObjectKey, FUNCAccumulatorSum} from "./functional";
-import {multiply, MathArray, qr} from "mathjs";
+
+// import {utils} from "../r_three";
+import {Accumulator, ForEachArrayIndex, ForEachObjectItem, FUNCAccumulatorSum} from "./functional";
+// import {matrix} from "mathjs";
+import {MathArray, qr, multiply} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
@@ -69,7 +71,7 @@ class Algebra {
   // let c2hat = (C_DOT(c2, c1) / (C_DOT(c1, c1))).mult(c1);
 
   static GetRad(point: Quackable) {
-    return Math.atan2(point.y, point.x);
+    return Math.atan2(-1 * point.y, point.x);
   }
 
   // intersect to ...... <-- how to choose quadrants?
@@ -111,7 +113,7 @@ class Algebra {
     let fullPoints = C_ARRAY_ELEMENT_SCALE(C_ARRAY_COPY(point), projectionZ);
     fullPoints.pop();
 
-    let vecA = utils.ArrayToVec3(point);
+    // let vecA = utils.ArrayToVec3(point);
     return fullPoints;
   }
 
@@ -186,7 +188,7 @@ class Algebra {
     // eg. multiply<T typeof MathArray | MathType | Unit> (x: T, y: T): T
     let projected = multiply(matrixData, locationWScale);
     // let projected = math.multiply(matrixData, locationWScale);
-    return projected;
+    return <number[]>projected;
   }
 
   // ????? why cant you unionize it. find the innermost 1D array, and merge them

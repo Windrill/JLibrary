@@ -52,9 +52,6 @@ class R_Canvas extends CanvasPassAlong {
   // takes in 3D dot, outputs 2D projection
   // you wanted this to also support 3d scaling..............
 
-  // THREE.Matrix4();
-  // }
-
   /**
    * 1 is down, -1 is up
    * @param point: from location
@@ -167,7 +164,7 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
-  // Change this too
+  // structures.ts D_Rect also has one
   crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = {
     fillStyle: "#000000",
     debug: false,
@@ -182,7 +179,14 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.rect(a, b, w, h);
     this.context.ctx.fill();
     this.context.ctx.closePath();
+  }
 
+  crectd(drect : D_Rect, {fillStyle, debug, lineWidth} = {
+    fillStyle: "#000000",
+    debug: false,
+    lineWidth: 1
+  }) {
+    this.crect(drect.x, drect.y, drect.width, drect.height, {fillStyle, debug, lineWidth});
   }
 
   // ?? See MidPointToBottomLeft, structures.ts

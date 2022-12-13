@@ -1,1 +1,6 @@
 how to run these tests independently?
+
+Recommendations: Don't run tsc! It will produce js files that messes up all your module exports.
+
+
+ vite ./JLibrary/tests/text_layer/

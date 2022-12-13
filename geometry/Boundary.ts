@@ -82,13 +82,12 @@ class Boundary extends CObject {
     return `(${this.points[0].x},${this.points[0].y})  -> (${this.points[1].x},${this.points[1].y})`;
   }
 }
-
+/*
 class Plane {
-
   draw() {
 
   }
-}
+}*/
 
 export {
   Boundary,

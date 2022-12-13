@@ -1,6 +1,5 @@
-import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SCALE} from "./algebra";
+import {C_ARRAY_COPY} from "./algebra";
 import {R_Canvas} from "../canvas/canvas";
-import {arg} from "mathjs";
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
@@ -48,7 +47,7 @@ interface CanvasContext {
 // Canvas context is almost common for html canvas objects
 // Can be a THREE context too.
 class CanvasPassAlong {
-  protected context : CanvasContext;
+  public context : CanvasContext;
   constructor(context: CanvasContext) {
     this.context = context;
     // console.log("Try: ", this.context);
@@ -174,6 +173,7 @@ class D_Rect {
     ];
   }
 
+  // canvas.ts also has one
   show(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.lineWidth = 0.5;
@@ -190,12 +190,14 @@ class D_Rect {
   }
 
   // If i want to test this function against javascript graphing engine, I just have an 'interactive'?
-  intersects(range: QuackingV2) {
-    // first eval: left side of range rect is beyond (>) right side of this rect
-    return !(range.x > this.x + this.width ||
-      range.x < this.x - this.width ||
-      range.y > this.y + this.height ||
-      range.y < this.y - this.height);
+  intersects(range: D_Rect) {
+    if (range.x > this.x + this.width || this.x > range.x + range.width) {
+      return false;
+    }
+    if (range.y > this.y + this.height || this.y > range.y + range.height) {
+      return false;
+    }
+    return true;
   }
 }
 

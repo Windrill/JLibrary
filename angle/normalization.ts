@@ -1,5 +1,4 @@
-import {C_ARRAY_COPY, C_ARRAY_ELEMENT_ADD, C_ARRAY_ELEMENT_SUB, RAD2DEG} from "../functions/algebra";
-import {Quackable} from "../functions/structures";
+import {C_ARRAY_COPY, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
 
 let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   let period = to - from;

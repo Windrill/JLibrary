@@ -24,7 +24,7 @@ Style
 // R_ draw calls related (render)
 C_ <-- my structures, mostly drawing material
 C3_ <-- drawing material using THREE.JS
-// files are lowercase, classes and funcctions, types are upper
+// files are lowercase, classes and functions, types are upper
 
 
 Typescript Indexer (for convenience)

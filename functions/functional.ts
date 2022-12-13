@@ -34,7 +34,7 @@ const FUNCAccumulatorSum = (acc : number, numberAtI : number) => {
   return acc + numberAtI;
 };
 
-function Accumulator(func: any, array: any[], acc : any = 0): any {
+function Accumulator<T, S>(func: (t:T, s:S)=>T, array: S[], acc : T): any {
   for (let i = 0; i < array.length; i++) {
     acc = func(acc, array[i]);
   }
@@ -56,6 +56,27 @@ function ArrayClone(arr: any[]) {
     ret.push(arr[i]);
   }
   return ret;
+}
+
+/*
+Returns positions of the sorted array using this function
+Comparator: > 0	means "a > b", a after b
+ */
+function IndexSort<T>(arr : T[], comparator : (a: T, b: T) => number) : number[] {
+  let sortedIndices : number[] = [];
+  type indexPairType = [T, number];
+  let arrBoth : indexPairType[] = [];
+  ForEachArrayIndex((i : number)=>{
+    arrBoth.push([arr[i], i]);
+  }, arr);
+
+  arrBoth.sort((a : indexPairType, b: indexPairType) : number=> {
+    return comparator(a[0], b[0]);
+  });
+  ForEachArrayItem((a : indexPairType) => {
+    sortedIndices.push(a[1]);
+  }, arrBoth);
+  return sortedIndices;
 }
 
 // Intention: runs this once or multiple times based on 'array-like' status (on this object, or on each element of the array)
@@ -80,7 +101,8 @@ export {
   ForEachObjectItem,
 
   Accumulator,
-  CompositeFunc
+  CompositeFunc,
+  IndexSort
 }
 
 export {
