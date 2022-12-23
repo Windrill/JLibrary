@@ -3,6 +3,7 @@ import {D_Rect, Quackable} from "../functions/structures";
 import {CObject} from "../geometry/Boundary";
 import {ForEachArrayIndex, ForEachArrayItem, IndexSort} from "../functions/functional";
 import {R_Canvas} from "./canvas";
+import {ExpandXdGrid, XNode} from "./grid_area";
 
 /**
  * Special data structure for text
@@ -51,11 +52,14 @@ class TextLayer {
   boxes: DrawingSize[];
   rCanvas: R_Canvas;
 
+  gridArea: ExpandXdGrid;
+
   constructor(rCanvas: R_Canvas) {
     this.rCanvas = rCanvas;
     let canvasSize = this.rCanvas.context.canvasSize;
     this.qt = new QuadTree(new D_Rect(0, 0, canvasSize.W, canvasSize.H));
     this.boxes = [];
+    this.gridArea = new ExpandXdGrid([0, 0], [canvasSize.W, canvasSize.H]);
   }
 
   // maybe only create these drawings in this factory function...
@@ -67,10 +71,10 @@ class TextLayer {
   // Most of the time, I want to annotate something. Which means I want this thing to be somewhere close
   // which is not on a point. Maybe 20 pixels away by default at a 45 degree angle.
   // Text's line color, and text's color.... another customization object.
-  addText(text: string, x: number, y: number): DrawingSize {
+  addText(text: string, x: number, y: number, w: number = 200, h:number = 100): DrawingSize {
     // I need to add this properly into the text layer... How to make sure it's added? Get the id.
     // What's the quadpoint associated to you? Every text should have a tree representation.
-    let newDraw: DrawingSize = new DrawingSize(text, {x: x, y: y});
+    let newDraw: DrawingSize = new DrawingSize(text, {x: x, y: y}, w, h);
     this.boxes.push(newDraw);
     // private points: {
     //     // object's keys are string[]....
@@ -94,6 +98,9 @@ class TextLayer {
     }
 
     this.qt.insert(newDraw.qPoint.pos);
+    // Constants again!!!
+    this.gridArea.add([x, y], [x + w, y + h]);
+
     return newDraw;
     // how to find closest free rectangle?
     // if (newDraw.boundary.intersects(otherRectangle)) {
@@ -126,7 +133,7 @@ class TextLayer {
       quadArea.pos.x, qtBounds.y,
       qtBounds.x + qtBounds.width, qtBounds.y + qtBounds.height));
 
-    // Boxes on the side
+    // Boxes on the boundary being added at runtime....
     let leftMost = new QuadPoint(0, 0);
     let rightMost = new QuadPoint(qtBounds.x + qtBounds.width, qtBounds.y + qtBounds.height);
     boxesToRight.push(rightMost);
@@ -139,6 +146,8 @@ class TextLayer {
       return a.pos.x > b.pos.x ? 1 : a.pos.x == b.pos.x ? 0 : -1;
     });
 
+    // on top = poorly sorted indices. making guesses at best.
+    // in comparison, XGrid is properly sorted at all times.
     console.log("Boxes to right starting point: ", boxesToRightSI);
     console.log("All boxes to ur right, ", boxesToRight);
     // Intervals between each X.
@@ -165,6 +174,9 @@ class TextLayer {
     let foundRect: D_Rect = new D_Rect();
     let foundOne = false;
     ForEachArrayItem((i: number) => {
+      if (i < rightXIntervalsSI.length - 1) {
+        return; // didn't find any intervals that were valid. please write somes test cases related to this.
+      }
       // 1, 0, 2 <-- 1 is 30-40, 1 = index of actual point
       if (foundOne) {
         return;
@@ -209,10 +221,83 @@ class TextLayer {
     return foundRect;
   }
 
-  slowSearchSpace() {
+  // Doesn't have to lie within text layer. It's the 'empty spacesaarch' area.
+  // you have realy ppoo data organization.
+  slowSearchSpace(quadArea: QuadPoint) : [number, number, boolean] {
     // 1. Divide Grid
-    let grid : number[][] = [[0]];
-    // Top left of grid is always 0.
+    // should move to uper level. in curernt 'design' slowsearch already means you can't find intervals correctly
+    // let grid : number[][] = [[0]];
+    quadArea.pos;
+    let tryAdd = this.gridArea.add([quadArea.pos.x, quadArea.pos.y],
+        [quadArea.pos.width, quadArea.pos.height]);
+    if (tryAdd) {
+      console.log("Add is empty so successful.");
+      // this.addText();
+      return [quadArea.pos.x, quadArea.pos.y, true];
+    }
+
+    // Lowest number that is highr than threahold x.
+    let comparatorGen = (threshold : number)=> {
+      return (a : number, b : number) : number => {
+        // if any is < threshold,
+        return (a > threshold || b > threshold) ? (a - b) : b - a;
+      };
+    }
+    /*
+    1. get intervals of boxesToRight.
+
+
+     */
+    let horDim = false;
+    let vertDim = false;
+    let resultPos = [0, 0];
+    for (let dimI=0;dimI<this.gridArea.dimensions;dimI++) {
+        let intervalFromNumDiff : number[] = [];
+        ForEachArrayIndex((diffIdx : number) => {
+          if (diffIdx == 0) return;
+          intervalFromNumDiff.push(this.gridArea.grid[dimI][diffIdx].fromNum - this.gridArea.grid[dimI][diffIdx-1].fromNum);
+        }, this.gridArea.grid[dimI]);
+
+        // "Index sort"
+        let intervalFromNumDiffSI : number[] = IndexSort<number>(intervalFromNumDiff, comparatorGen(quadArea.pos.x));
+
+        // Actually it just takes the first result, no need for so many.
+        ForEachArrayItem((i : number) => {
+          if (i == 0) return;
+          if (dimI == 0 && horDim) return;
+          if (dimI == 1 && vertDim) return;
+          // the difference is, i want the actual boxes. but these grids store smth different don't they...
+1
+            // wait. you're only going to return an interval that is empty!!! Don't relate the 2 data structures.
+          let leftD : number = intervalFromNumDiff[i-1];
+          let rightD : number = intervalFromNumDiff[i];
+          // If space is greater than space it takes to insert, ok
+          // A bit hacky, because posture is 2 dimensional only for now. While grid suppports multi-dimensional, your data structures here aren't necessarily 2D
+          if (dimI == 0 && rightD - leftD > quadArea.pos.width) {
+            resultPos[0] = leftD;
+            horDim = true;
+          }
+          if (dimI == 1 && rightD - leftD > quadArea.pos.height) {
+            resultPos[1] = leftD;
+            vertDim = true;
+          }
+        }, intervalFromNumDiffSI);
+        console.log("Got empty position in : ", resultPos);
+        // I can't add text legally here. You're just querying the first valid area.
+      // If you realy need to this place can do some caaching also. For search queries. But not the others......
+        // console.log("I'm just going to add the text here now.");
+    } // End dimension for loop.
+
+      if (horDim && vertDim) {
+          return [resultPos[0], resultPos[1], true];
+      }
+      return [-1, -1, false];
+
+    // actually don't need, because you're just calculating intervals that are free again.
+    // so just do a read....
+   // for all intervals in each dimension, if there is something that is free within interval,
+   // sort them from large to small then take it. either that or take the first
+   // ....
     // for every unique area, check....if it's there. Basically have an array with all unique areas represented
     // then go through each section and cross it out for all areas this section(object) occupies
     /*

@@ -4,3 +4,9 @@ Recommendations: Don't run tsc! It will produce js files that messes up all your
 
 
  vite ./JLibrary/tests/text_layer/
+
+If jest keeps complaining about modules not found or imported, use:
+   "jest": {
+     "preset": "ts-jest"
+   }
+in package.json

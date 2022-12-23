@@ -94,7 +94,10 @@ class ExpandXdGrid {
     this.add(start, end, false);
   }
 
-  add(start: number[], end: number[], add: boolean = true) {
+  /*
+  If you add, then it's an insertion. If add is false, it's a removal.
+   */
+  add(start: number[], end: number[], add: boolean = true): boolean {
     console.assert(start.length == end.length);
     let startNodes: XNode[] = [];
     let endNodes: XNode[] = [];
@@ -110,13 +113,14 @@ class ExpandXdGrid {
 
     if (!canAdd) {
       console.log("Value cannot be added for this range, range is occupied, or interval = 0", start, end);
-      return;
+      return false;
     }
     // console.log("Add point, since grid is free here.", start, end);
 
     ForEachArrayIndex((i: number) => {
       this.addOneDim(i, startNodes[i], endNodes[i]);
     }, start);
+    return true;
   }
 
   // After position already here

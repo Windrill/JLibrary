@@ -1,6 +1,4 @@
 import {ForEachArrayIndex, ForEachArrayItem, IndexSort} from "../functions/functional";
-// import {i} from "mathjs";
-
 
 describe('Function Tests', () => {
   test('Index Sort', () => {
