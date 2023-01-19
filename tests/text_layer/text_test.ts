@@ -1,6 +1,6 @@
 import {R_Canvas} from "../../canvas/canvas";
 import {BackendType, CanvasContext} from "../../functions/structures";
-import {TextLayer} from "../../canvas/text_layer";
+import {TextLayer} from "../../canvas/grid/text_layer";
 
 let canvas = document.getElementsByTagName("canvas")[0];
 

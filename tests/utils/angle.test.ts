@@ -1,4 +1,4 @@
-import {NormalizeWithinPeriod} from "../angle/normalization";
+import {NormalizeWithinPeriod} from "../../angle/normalization";
 
 let diffBtwnAngles = (angle1: number, angle2: number, from: number, to: number) => {
   let normalized1 = NormalizeWithinPeriod(angle1, from, to);

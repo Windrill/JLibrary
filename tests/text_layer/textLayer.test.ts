@@ -1,5 +1,5 @@
-import {TextLayer} from "../../canvas/text_layer";
-import {ExpandXdGrid, XNode} from "../../canvas/grid_area";
+import {TextLayer} from "../../canvas/grid/text_layer";
+import {ExpandXdGrid, XNode} from "../../canvas/grid/grid_area";
 
 
 let textLayer : TextLayer;

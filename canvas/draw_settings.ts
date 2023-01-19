@@ -1,6 +1,6 @@
 // Generated differently for each lambda??
 // One per point
-import {ForEachArrayIndex} from "../functions/functional";
+import {ForEachArrayIndex, ForEachObjectKey} from "../functions/functional";
 const DrawSettingsKeys = ["radius", "startAngle", "endAngle", "_anticlockwise", "color", "name"];
 
 class DrawSettings {
@@ -14,6 +14,13 @@ class DrawSettings {
   name = "";
   // Multidimensional: 3rd axis is z, or is it ????
 
+  constructor(options?: Partial<DrawSettings>) {
+    if (options) {
+      ForEachObjectKey((k: string) => {
+        this.k = options[k];
+      }, options);
+    }
+  }
   // multidimensional axis still have the same resulting properties as regular draw settings! hence,
   // drawsettings might be generated twice for each new axis, but dimensions are same
   copy() {

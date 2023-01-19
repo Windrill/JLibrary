@@ -26,8 +26,12 @@ function ForEachObjectKey(func: any, object: { }) {
   ForEachArrayItem(func, Object.keys(object));
 }
 
-function ForEachObjectItem(func: any, object: { }) {
-  ForEachArrayItem(func, Object.keys(object));
+function ForEachObjectItem(func: any, object: {
+  [index: string] : any
+}) {
+  ForEachArrayItem((k : string) => {
+    func(object[k]);
+  }, Object.keys(object));
 }
 
 const FUNCAccumulatorSum = (acc : number, numberAtI : number) => {

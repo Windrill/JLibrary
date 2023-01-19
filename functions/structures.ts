@@ -1,5 +1,9 @@
 import {C_ARRAY_COPY} from "./algebra";
 import {R_Canvas} from "../canvas/canvas";
+import {DrawSettings} from "../canvas/draw_settings";
+export function getInstance<T extends Object>(type: (new (...args: any[]) => T), ...args: any[]): T {
+  return new type(...args);
+}
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
@@ -47,7 +51,8 @@ interface CanvasContext {
 // Canvas context is almost common for html canvas objects
 // Can be a THREE context too.
 class CanvasPassAlong {
-  public context : CanvasContext;
+  public context: CanvasContext;
+
   constructor(context: CanvasContext) {
     this.context = context;
     // console.log("Try: ", this.context);
@@ -84,10 +89,10 @@ converts
 type boxTuple = [number, number, number, number];
 
 
-function MidPointToTopLeftBoxTuple(...args: boxTuple) : boxTuple {
+function MidPointToTopLeftBoxTuple(...args: boxTuple): boxTuple {
   let addedReturns = MidPointToTopLeft(...args);
   let defaults = [0, 0, 0, 0]
-  let firstFour : number[] = [...addedReturns, ...defaults];
+  let firstFour: number[] = [...addedReturns, ...defaults];
   firstFour = firstFour.slice(0, 4);
   return [firstFour[0], firstFour[1], firstFour[2], firstFour[3]];
 }
@@ -99,7 +104,7 @@ function MidPointToTopLeftBoxTuple(...args: boxTuple) : boxTuple {
  */
 // haven't used before, lol, looks very eveil
 // 100,100,20,20 --> 80,80? or should have been 90,90-110,110?
-function MidPointToTopLeft(...args: number[]) : number[] {
+function MidPointToTopLeft(...args: number[]): number[] {
   let halfLength = args.length / 2;
   let returns = C_ARRAY_COPY(args);
   for (let i = 0; i < halfLength; i++) {
@@ -130,7 +135,7 @@ function MidPointToBottomLeft(...args: number[]) {
 
 type D_Line = {
   fromPoint: Quackable;
-  toPoint : Quackable;
+  toPoint: Quackable;
 };
 
 class D_Rect {
@@ -190,11 +195,13 @@ class D_Rect {
   }
 
   // If i want to test this function against javascript graphing engine, I just have an 'interactive'?
-  intersects(range: D_Rect) {
-    if (range.x > this.x + this.width || this.x > range.x + range.width) {
+  intersects(range: D_Rect, pointOverlap: boolean = false) {
+    // If point overlap is enabled, don't allow boxes to share a common point.
+    let point = pointOverlap ? 0 : 1;
+    if (range.x > this.x + this.width - point || this.x > range.x + range.width - point) {
       return false;
     }
-    if (range.y > this.y + this.height || this.y > range.y + range.height) {
+    if (range.y > this.y + this.height - point || this.y > range.y + range.height - point) {
       return false;
     }
     return true;
@@ -208,7 +215,8 @@ class D_Circle {
   public x: number;
   private readonly name: string;
   private readonly radius: number;
-  constructor({name="point", radius=8, color="#EE4433"}={}) {
+
+  constructor({name = "point", radius = 8, color = "#EE4433"} = {}) {
     // let's say this is the center point
     this.x = 20;
     this.y = 20;
@@ -217,8 +225,16 @@ class D_Circle {
     this.color = color;
     this.hover = false;
   }
-  set(obj : QuackingV2) {this.x = obj.x; this.y = obj.y;}
-  selected() {return this.hover;}
+
+  set(obj: QuackingV2) {
+    this.x = obj.x;
+    this.y = obj.y;
+  }
+
+  selected() {
+    return this.hover;
+  }
+
   select() {
     this.hover = true;
   }
@@ -226,14 +242,29 @@ class D_Circle {
   deselect() {
     this.hover = false;
   }
-  within(x : number, y : number) {
-    return Math.sqrt(Math.pow(x-this.x,2)+Math.pow(y-this.y,2)) < this.radius;
+
+  within(x: number, y: number) {
+    return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)) < this.radius;
   }
 
   display(rCanvas: R_Canvas) {
-    rCanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius, 0, 360, false, this.color);
-    if(this.hover) {
-      rCanvas.cpoint({x:this.x, y:this.y}, this.name, this.radius-2, 0, 360, false, "#ffffff");
+    rCanvas.cpoint({x: this.x, y: this.y},
+      new DrawSettings({
+        name: this.name,
+        radius: this.radius,
+        startAngle: 0, endAngle: 360, _anticlockwise: false, color: this.color
+      })
+    );
+    if (this.hover) {
+      rCanvas.cpoint({x: this.x, y: this.y},
+        new DrawSettings({
+          name: this.name,
+          radius: this.radius - 2,
+          startAngle: 0,
+          endAngle: 360,
+          _anticlockwise: false,
+          color: "#ffffff"
+        }));
     }
   }
 
@@ -244,12 +275,13 @@ class D_Circle {
 // Constant types
 class D_Point {
   [index: number]: any
+
   x: number;
   y: number;
   z: number = 0;
   zValid: boolean = false;
 
-  constructor(x : number, y : number, z: number|undefined=undefined) {
+  constructor(x: number, y: number, z: number | undefined = undefined) {
     this.x = x;
     this.y = y;
     if (z) {

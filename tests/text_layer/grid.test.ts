@@ -1,4 +1,4 @@
-import {ExpandXdGrid, XNode} from "../../canvas/grid_area";
+import {ExpandXdGrid, XNode} from "../../canvas/grid/grid_area";
 import {ArrToString} from "../../functions/array";
 
 let assertNode = (n: XNode, data : [number, boolean]) =>{

@@ -38,7 +38,7 @@ class CObject {
 // jlibrary->rthree
 // why boundary is separate from ray??
 // totally a static object, no la it's just the static thing that a ray casts against, boundaries
-// done't need to cast anything they're the objects inside a map, so always use this
+// don't need to cast anything they're the objects inside a map, so always use this
 class Boundary extends CObject {
   points : THREE.Vector2[];
   constructor(p1 = ORG2, p2 = ORG2) {

@@ -8,6 +8,17 @@ import {
 } from "./structures";
 import {utils} from "../r_three";
 
+type StrIndexable  = {
+  [index: string]: any;
+};
+
+function AllZeroArray(n : number) {
+  let allZeros = [];
+  for(let i=0;i<n;i++) {
+    allZeros.push(0);
+  }
+  return allZeros;
+}
 // import {utils} from "../r_three";
 import {Accumulator, ForEachArrayIndex, ForEachObjectItem, FUNCAccumulatorSum} from "./functional";
 // import {matrix} from "mathjs";
@@ -193,7 +204,8 @@ class Algebra {
 
   // ????? why cant you unionize it. find the innermost 1D array, and merge them
   static Average(dims: OneDArray) {
-    let arraySum = Accumulator(FUNCAccumulatorSum, dims);
+    let arraySum = 0;
+    arraySum = Accumulator(FUNCAccumulatorSum, dims, arraySum);
     return arraySum / dims.length;
   }
 
@@ -374,7 +386,9 @@ export {
   SYN_GetMethods,
 
   Polar2Cartesian,
-  Cartesian2Polar
+  Cartesian2Polar,
+  StrIndexable,
+  AllZeroArray
 }
 
 export {

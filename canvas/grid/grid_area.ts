@@ -1,5 +1,5 @@
-import {Accumulator, ForEachArrayIndex} from "../functions/functional";
-import {ArrToString, BinarySearch} from "../functions/array";
+import {Accumulator, ForEachArrayIndex} from "../../functions/functional";
+import {ArrToString, BinarySearch} from "../../functions/array";
 
 
 class XNode {
@@ -19,6 +19,7 @@ class XNode {
     return `${this.beforeNode ? "<-" : ""}(${this.fromNum}, ${this.data})${this.nextNode ? "->" : ""}`;
   }
 
+  // use typescript and specialization for this now.
   static compare = (x: XNode, y: XNode): number => {
     return x.fromNum - y.fromNum;
   }

@@ -1,8 +1,8 @@
-import {QuadPoint, QuadTree} from "../../boids/QuadTree";
-import {D_Rect, Quackable} from "../functions/structures";
-import {CObject} from "../geometry/Boundary";
-import {ForEachArrayIndex, ForEachArrayItem, IndexSort} from "../functions/functional";
-import {R_Canvas} from "./canvas";
+import {QuadPoint, QuadTree} from "../../../boids/QuadTree";
+import {D_Rect, Quackable} from "../../functions/structures";
+import {CObject} from "../../geometry/Boundary";
+import {ForEachArrayIndex, ForEachArrayItem, IndexSort} from "../../functions/functional";
+import {R_Canvas} from "../canvas";
 import {ExpandXdGrid, XNode} from "./grid_area";
 
 /**
@@ -207,8 +207,7 @@ class TextLayer {
         }
       }
     }, rightXIntervalsSI);
-
-    console.log("Finding foundrect: ", foundRect);
+    console.log("Finding foundRect: ", foundRect);
 
     // let foundLeft: QuadPoint[] = [];
     // Do the same thing to the left:
@@ -217,17 +216,15 @@ class TextLayer {
     //   qtBounds.y,
     //   quadArea.pos.x,
     //   qtBounds.y + qtBounds.height), foundLeft);
-
     return foundRect;
   }
 
-  // Doesn't have to lie within text layer. It's the 'empty spacesaarch' area.
-  // you have realy ppoo data organization.
+  // Doesn't have to lie within text layer. It's the 'empty spaceSearch' area.
+  // you have really poor data organization.
   slowSearchSpace(quadArea: QuadPoint) : [number, number, boolean] {
     // 1. Divide Grid
-    // should move to uper level. in curernt 'design' slowsearch already means you can't find intervals correctly
+    // should move to upper level. in current 'design' slowsearch already means you can't find intervals correctly
     // let grid : number[][] = [[0]];
-    quadArea.pos;
     let tryAdd = this.gridArea.add([quadArea.pos.x, quadArea.pos.y],
         [quadArea.pos.width, quadArea.pos.height]);
     if (tryAdd) {
@@ -236,7 +233,7 @@ class TextLayer {
       return [quadArea.pos.x, quadArea.pos.y, true];
     }
 
-    // Lowest number that is highr than threahold x.
+    // Lowest number that is higher than threahold x.
     let comparatorGen = (threshold : number)=> {
       return (a : number, b : number) : number => {
         // if any is < threshold,
@@ -245,7 +242,6 @@ class TextLayer {
     }
     /*
     1. get intervals of boxesToRight.
-
 
      */
     let horDim = false;
@@ -267,8 +263,8 @@ class TextLayer {
           if (dimI == 0 && horDim) return;
           if (dimI == 1 && vertDim) return;
           // the difference is, i want the actual boxes. but these grids store smth different don't they...
-1
-            // wait. you're only going to return an interval that is empty!!! Don't relate the 2 data structures.
+
+          // wait. you're only going to return an interval that is empty!!! Don't relate the 2 data structures.
           let leftD : number = intervalFromNumDiff[i-1];
           let rightD : number = intervalFromNumDiff[i];
           // If space is greater than space it takes to insert, ok
@@ -284,7 +280,7 @@ class TextLayer {
         }, intervalFromNumDiffSI);
         console.log("Got empty position in : ", resultPos);
         // I can't add text legally here. You're just querying the first valid area.
-      // If you realy need to this place can do some caaching also. For search queries. But not the others......
+      // If you really need to this place can do some caaching also. For search queries. But not the others......
         // console.log("I'm just going to add the text here now.");
     } // End dimension for loop.
 

@@ -1,8 +1,9 @@
-import {BinarySearch} from "../functions/array";
+import {BinarySearch} from "../../functions/array";
 
 
 describe('Binary search array', () => {
   test('BS Regular', () => {
+    //         0  1  2  3  4  5  6   7   8   9   10
     let arr = [1, 3, 4, 5, 6, 9, 11, 15, 22, 40, 56];
     {
       let r = BinarySearch(arr, 8);
@@ -15,6 +16,16 @@ describe('Binary search array', () => {
     {
       let r = BinarySearch(arr, 9, false);
       expect(r).toBe(6);
+    }
+    {
+      let r = BinarySearch(arr, 999, false);
+      expect(r).toBe(arr.length);
+    }
+    {
+      // If search fails, insert at first, because this searches for the nearest index.
+      // , (x: any, y: any) => (x.valueOf()) - y.valueOf(), true
+      let r = BinarySearch(arr, -1, false);
+      expect(r).toBe(0);
     }
   });
 
