@@ -9,6 +9,7 @@ import {
 import { ColorConversions } from "../tools/color_conversions"
 import {Algebra, DEG2RAD} from "../functions/algebra";
 import {DrawSettings} from "./draw_settings";
+import {sqrt} from "mathjs";
 
 
 // Options settings....
@@ -52,7 +53,17 @@ class R_Canvas extends CanvasPassAlong {
   // takes in 3D dot, outputs 2D projection
   // you wanted this to also support 3d scaling..............
 
-  /**
+  // Convenience for 2 points, from and to.
+  carrowo(bFrom: QuackingV2, bTo: QuackingV2, ...Args: any) {
+    let quackDiff = {
+      x: bTo.x - bFrom.x,
+      y: bTo.y - bFrom.y
+    };
+    // magnitude and squareroot function here
+    this.carrow(bFrom, quackDiff, Math.sqrt(quackDiff.x*quackDiff.x+quackDiff.y*quackDiff.y), ...Args);
+  }
+
+    /**
    * 1 is down, -1 is up
    * @param point: from location
    * @param direction: a ratio, magnitude is not referenced in this direction

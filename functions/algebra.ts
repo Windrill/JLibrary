@@ -81,9 +81,26 @@ class Algebra {
   // ];
   // let c2hat = (C_DOT(c2, c1) / (C_DOT(c1, c1))).mult(c1);
 
+  static Approx(x : number, y : number, eps : number = 0.003) {
+    return Math.abs(x - y) < eps;
+  }
+
+  /**
+  Range:   [-π, π]
+   */
   static GetRad(point: Quackable) {
     return Math.atan2(-1 * point.y, point.x);
   }
+
+  /**
+   * Range: -PI
+   * @param point
+   * @param Quackable
+   * @constructor
+   */
+  // static GetFullRad(point, Quackable) {
+  //
+  // }
 
   // intersect to ...... <-- how to choose quadrants?
 

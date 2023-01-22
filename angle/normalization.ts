@@ -1,8 +1,21 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
 
+// angle subtraction:
+// 30 - 40 vs 40 - 30 degrees must be different.
+// indicate clockwise and counter clockwise in some manner.
+
+// must not exceed 360, also when there are 2 ways..... 110--70 -> this is 180. -70 - 110, -110 - 70, 70 - -110
+let AngleDiff = (angle1 : number, angle2 : number) => {
+
+}
+// angle additiono???? -70 + 110,
+// it's almost like, + is undoing.
+// which means you either flip angles. or flip angles, never add them.
+
 let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
   let period = to - from;
   if (period < 0) {
+    console.log(from, to, to - from, period);
     console.log("Circle range should be from small to large. Invalid period is not allowed");
     return 0;
   }
@@ -16,7 +29,7 @@ let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
     }
     // console.log(angle, period);
     angle = angle % (period);
-    if (angle >= to) { // for the exatra 1
+    if (angle >= to) { // for the extra 1
       angle -= period;
     }
     // console.log(angle, from);
