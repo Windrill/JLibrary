@@ -1,9 +1,9 @@
-import {QuadPoint, QuadTree} from "../../../boids/QuadTree";
+import {QuadPoint, QuadTree} from "../structures/QuadTree";
 import {D_Rect, Quackable} from "../../functions/structures";
 import {CObject} from "../../geometry/Boundary";
 import {ForEachArrayIndex, ForEachArrayItem, IndexSort} from "../../functions/functional";
 import {R_Canvas} from "../canvas";
-import {ExpandXdGrid, XNode} from "./grid_area";
+import {ExpandXdGrid} from "./grid_area";
 
 /**
  * Special data structure for text
