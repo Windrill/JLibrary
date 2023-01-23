@@ -4,7 +4,6 @@ import * as THREE from 'three'
 import {ArrayAlloc, ForEachArrayIndex, ForEachArrayItem} from "../functions/functional";
 import {R_Canvas} from "../canvas/canvas";
 import {Boundary} from "./Boundary";
-import {diag} from "mathjs";
 import {Quack2Vector2} from "./Conversions";
 
 class PlayerParticle {
@@ -36,7 +35,6 @@ class PlayerParticle {
     this.rotation += rot;
 
     ForEachArrayItem((ray: CRay) => {
-      let lolRandomP = Polar2Cartesian(1, rot);
       let newRot = Cartesian2Polar(ray.direction) + rot;
       let newDirection = Polar2Cartesian(1, newRot);
       // {x: ray.direction.x + lolRandomP.x, y: ray.direction.y + lolRandomP.y}

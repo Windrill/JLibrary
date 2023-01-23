@@ -8,7 +8,7 @@
  * what are we usimg it for????? dunno.....because i could only query it but i want to query
  * // all at x =100, im just gonna pu the list
  */
-import {Accumulator, ForEachArrayItem} from "../../functions/functional";
+import {Accumulator} from "../../functions/functional";
 import {BinarySearch} from "../../functions/array";
 
 class DimNum {
@@ -53,8 +53,15 @@ let comareNode = (node : kdNode, value : DimPoint) => {
   })
   return index;
 }
-
+let sampleNode : kdNode = {
+  parent: undefined,
+  children: [],
+  node: [new DimNum(2, 'x'), new DimNum(3, 'y')]
+};
+comareNode(sampleNode, [new DimNum(1, 'x')]);
+/*
 type kdDifferentiate = DimNum;
+
 class kdTree {
   height : number;
   root : kdDifferentiate;
@@ -64,21 +71,21 @@ class kdTree {
     this.root = new DimNum(0, defaultDimensions[0]);
   }
   // parent dimnum, and the left or right indication child number
-  find(node : DimPoint) : [DimNum?, number?] {
-    // for each node find the correct branch,
-    // k could be either one or many.......
-    let r : DimNum = this.root;
-    while (r) {
-      let idx = (comareNode(r, node));
-      r = r
-    return [];
-  }
-  rebalance() {
-    // i think move the root around.
-  }
-  add(node : kdNode) {
-    // parent of node and its number
-    let findRes = find(node);
-    // if there is then youa dd it there. if there isn't....
-  }
-}
+//   find(node : DimPoint) : [DimNum?, number?] {
+//     // for each node find the correct branch,
+//     // k could be either one or many.......
+//     let r : DimNum = this.root;
+//     while (r) {
+//       let idx = (comareNode(r, node));
+//       r = r
+//     return [];
+//   }
+//   rebalance() {
+//     // i think move the root around.
+//   }
+//   add(node : kdNode) {
+//     // parent of node and its number
+//     let findRes = find(node);
+//     // if there is then youa dd it there. if there isn't....
+//   }
+}*/

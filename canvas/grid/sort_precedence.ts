@@ -3,10 +3,7 @@
  */
 import {ArrToString, BinarySearchNonUniform} from "../../functions/array";
 import {ForEachArrayIndex, ForEachArrayItem} from "../../functions/functional";
-import {AllZeroArray, StrIndexable} from "../../functions/algebra";
-import {number, re} from "mathjs";
-import {getInstance} from "../../functions/structures";
-import {found} from "@jridgewell/trace-mapping/dist/types/binary-search";
+import {StrIndexable} from "../../functions/algebra";
 
 // Can you remove this??
 class CustomData {
@@ -115,20 +112,6 @@ class SortNode<T extends StringRepresentationInterface<any>> {
   find x axis & y axis for a point
   find next x axis that is > y axis. which means you'll have to look through all x axis f
    */
-  ndFind(point : T, sequenceOfQueries : number[]) {
-    let ndResults = [];
-    ForEachArrayIndex((sequence : number) => {
-      if (sequenceOfQueries[sequence] == 0) {
-
-      }
-      let sameAxis = BinarySearchNonUniform<SortNode<T>, T>(
-        this.sortedTree,
-        point,
-        false,
-        this.dimComparator(this.dimPrecedence[sequence]));
-    }, sequenceOfQueries);
-
-  }
 
   findP(point : T) : number[] {
     let axes : number[] = [];
@@ -370,10 +353,10 @@ class SortNode<T extends StringRepresentationInterface<any>> {
 //   }
 //
 // }
-
 export {
   CustomData,
   // DimPoint,
   SortNode,
-  StringRepresentationInterface
-}
+  compare
+};
+export type { StringRepresentationInterface };

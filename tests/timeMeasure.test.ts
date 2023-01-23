@@ -9,3 +9,10 @@ function measure(lambdOrScope : any) {
   lambdOrScope();
 // console.log("Rendering at: ", fps);
 }
+
+describe('Time Measure Test', () => {
+  test('1', () => {
+    measure(()=>{});
+  });
+});
+export {}

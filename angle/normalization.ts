@@ -70,5 +70,6 @@ console.log(vec1, vec2, angleRes);
 export {
   NormalizeWithinPeriod,
   GetAngleRadian,
-  RadDiff2D
+  RadDiff2D,
+  AngleDiff
 }

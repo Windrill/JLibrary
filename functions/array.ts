@@ -1,12 +1,5 @@
-import {Accumulator, ForEachArrayIndex, ForEachArrayItem, ForEachObjectItem, ForEachObjectKey} from "./functional";
-import {number} from "mathjs";
+import {ForEachArrayIndex, ForEachArrayItem, ForEachObjectKey} from "./functional";
 import {StrIndexable} from "./algebra";
-
-class NumConv {
-  valueOf() {
-
-  };
-}
 
 function BinarySearchNonUniform<T extends Object, S extends Object>(arr: T[], find: S, largerThanEqual: boolean = true, comparator: (x: T, y: S) => number = (x: any, y: any) => (x.valueOf()) - y.valueOf()) {
   return bsIdxNonUniform(arr, find, largerThanEqual, 0, arr.length, comparator);

@@ -1,5 +1,14 @@
 // input: h in [0,360] and s,v in [0,1] - output: r,g,b in [0,1]
-import {clamp} from "three/src/math/MathUtils";
+// this threw an error in my jest test case:
+// /home/windrill/JS/graphing/node_modules/three/src/math/MathUtils.js:302
+// export {
+// SyntaxError: Unexpected token 'export'
+// import {clamp} from "three/src/math/MathUtils";
+function clamp( value: number, min: number, max: number ) {
+
+  return Math.max( min, Math.min( max, value ) );
+
+}
 import {round} from "mathjs";
 
 function hsl2rgb(h: number, s: number, l: number) {

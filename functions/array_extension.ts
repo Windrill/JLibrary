@@ -1,13 +1,16 @@
 
 interface ArrayConstructor {
   reshape(rows: number, cols: number): void;
-  length;
+  length: number;
 }
 
-Array.reshape = function (rows, cols) {
+// @ts-ignore
+Array.reshape = function (rows: number, cols: number) {
   // Array.prototype.reshape = function (rows, cols) {
+  // @ts-ignore
   var copy = this.slice(0); // Copy all elements.
   // Removes all items (and returns an array with them)
+  // @ts-ignore
   this.splice(0,this.length);
   // this.length = 0; // Clear out existing array.
 
@@ -19,6 +22,11 @@ Array.reshape = function (rows, cols) {
         row.push(copy[i]);
       }
     }
+    // @ts-ignore
     this.push(row);
   }
 };
+
+export type {
+  ArrayConstructor
+}

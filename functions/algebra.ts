@@ -6,7 +6,6 @@ import {
   QuackableV3,
   QuackingV2
 } from "./structures";
-import {utils} from "../r_three";
 
 type StrIndexable  = {
   [index: string]: any;
@@ -404,9 +403,9 @@ export {
 
   Polar2Cartesian,
   Cartesian2Polar,
-  StrIndexable,
   AllZeroArray
-}
+};
+export type { StrIndexable };
 
 export {
   DEG2RAD,

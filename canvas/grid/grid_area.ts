@@ -1,5 +1,5 @@
 import {Accumulator, ForEachArrayIndex} from "../../functions/functional";
-import {ArrToString, BinarySearch} from "../../functions/array";
+import {BinarySearch} from "../../functions/array";
 
 
 class XNode {
@@ -188,7 +188,8 @@ class ExpandXdGrid {
 */
 // Change Grid once, now you change it again
     let addEndLocation = BinarySearch(this.grid[dimNum], endNode, true, XNode.compare);
-    let lastAdd: boolean = this.grid[dimNum][addEndLocation - 1].data;
+    // let lastAdd: boolean =
+      this.grid[dimNum][addEndLocation - 1].data;
 
     // If this interval & endNode is the same
     this.insertNode(dimNum, addEndLocation, endNode);

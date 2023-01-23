@@ -1,4 +1,4 @@
-import {ForEachArrayIndex, ForEachArrayItem, ForEachObjectItem, IndexSort} from "../../functions/functional";
+import {ForEachArrayIndex, ForEachObjectItem, IndexSort} from "../../functions/functional";
 
 describe('Function Tests', () => {
   test('Index Sort', () => {

@@ -97,7 +97,7 @@ class TextLayer {
       console.log("Adding in empty space", newDraw.qPoint.pos);
     }
 
-    this.qt.insert(newDraw.qPoint.pos);
+    this.qt.insert(newDraw.qPoint);
     // Constants again!!!
     this.gridArea.add([x, y], [x + w, y + h]);
 

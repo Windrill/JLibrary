@@ -1,5 +1,5 @@
 import {Accumulator, ForEachArrayIndex} from "../../functions/functional";
-import {ArrToString, BinarySearch} from "../../functions/array";
+import {BinarySearch} from "../../functions/array";
 // it's like, you can use a binary tree for querying numbers, inserting numbers
 // but not for finding which interval between numbers is the greatest
 // how to find greatest interval?
@@ -14,6 +14,7 @@ class GridArea {
   constructor() {
     // unordered map
     this.gridMap = {};
+    this.gridList = [];
   }
   addArea(areaNum: [], approx = 1) {
     /*
@@ -208,7 +209,7 @@ class ExpandXdGrid {
 */
 // Change Grid once, now you change it again
     let addEndLocation = BinarySearch(this.grid[dimNum], endNode, true, XNode.compare);
-    let lastAdd: boolean = this.grid[dimNum][addEndLocation - 1].data;
+    // let lastAdd: boolean = this.grid[dimNum][addEndLocation - 1].data;
 
     // If this interval & endNode is the same
     this.insertNode(dimNum, addEndLocation, endNode);
@@ -234,5 +235,6 @@ class ExpandXdGrid {
 
 export {
   ExpandXdGrid,
-  XNode
+  XNode,
+  GridArea
 }

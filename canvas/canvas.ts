@@ -9,7 +9,6 @@ import {
 import { ColorConversions } from "../tools/color_conversions"
 import {Algebra, DEG2RAD} from "../functions/algebra";
 import {DrawSettings} from "./draw_settings";
-import {sqrt} from "mathjs";
 
 
 // Options settings....
@@ -24,7 +23,8 @@ interface DrawStyle {
 
 function initDrawStyle(options?: Partial<DrawStyle>): DrawStyle {
   const defaults = {
-    fillStyle: "#61adc4",
+    // fillStyle: "#61adc4",
+    fillStyle: "#000000",
     strokeStyle: "#ffffff",
     fontStyle: "16px serif",
     debug: false,

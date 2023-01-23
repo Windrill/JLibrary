@@ -245,11 +245,15 @@ class QuadTree {
     }
   }
 
+  getId() {
+    return this.id;
+  }
 
 } // end class
 
 export {
   Point,
   QuadTree,
-  QuadPoint
+  QuadPoint,
+  Point2Quad
 }

@@ -25,3 +25,7 @@ class Hybrid extends Object {
     // ok now it's sortable
   }
 }
+
+export {
+  Hybrid
+}

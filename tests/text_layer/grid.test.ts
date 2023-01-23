@@ -1,5 +1,4 @@
 import {ExpandXdGrid, XNode} from "../../canvas/grid/grid_area";
-import {ArrToString} from "../../functions/array";
 
 let assertNode = (n: XNode, data : [number, boolean]) =>{
   // also you might want to check links.... unfortunately you're not checking them now.

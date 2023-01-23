@@ -373,15 +373,15 @@ export {
 }
 
 export {
-  QuackingV2,
-  QuackingV3,
-  CanvasContext,
   CanvasPassAlong,
-  Quackable,
   QuackableV2,
   QuackableV3
 }
 export type {
+  QuackingV2,
+  QuackingV3,
+  CanvasContext,
+  Quackable,
   D_Line
 }
 

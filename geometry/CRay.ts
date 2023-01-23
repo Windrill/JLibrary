@@ -1,8 +1,8 @@
 import {R_Canvas} from "../canvas/canvas";
 import * as THREE from 'three'
-import {C_DOT, Polar2Cartesian, RAD2DEG} from "../functions/algebra";
+import {Polar2Cartesian, RAD2DEG} from "../functions/algebra";
 import {Boundary} from "./Boundary";
-import {MapStatic} from "../../scantraverse/map";
+// import {MapStatic} from "../../scantraverse/map";
 
 interface Drawable {
   draw(renderContext : R_Canvas) : void;
@@ -55,9 +55,8 @@ class CRay {
   }
 
   // overload??/
-  castObject(_obj : MapStatic) {
-
-  }
+  // castObject(_obj : MapStatic) {
+  // }
 
 
   // Line line collision?
@@ -94,6 +93,8 @@ class CRay {
 }
 
 export {
-  CRay,
+  CRay
+}
+export type {
   Drawable
 }

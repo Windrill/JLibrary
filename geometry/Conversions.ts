@@ -1,8 +1,7 @@
 import {CRay} from "./CRay";
-import {RadDiff2D, GetAngleRadian} from "../angle/normalization";
+import {GetAngleRadian} from "../angle/normalization";
 import * as THREE from 'three';
 import {Quackable, QuackableV3} from "../functions/structures";
-import {ForEachArrayIndex} from "../functions/functional";
 import {BigNumber, Complex, Fraction, MathNumericType} from "mathjs";
 
 function Quack2Vector2(from : Quackable) : THREE.Vector2 {
@@ -60,5 +59,7 @@ function Point2Arr(p : Quackable) : number[] {
 export {
   Vec2Ray,
   MathTypeToNumber,
-  Quack2Vector2
+  Quack2Vector2,
+  Arr2Point,
+  Point2Arr
 }
