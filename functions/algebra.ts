@@ -1,11 +1,8 @@
-import {
-  D_Point,
-  NDArray,
-  OneDArray,
-  Quackable,
-  QuackableV3,
-  QuackingV2
-} from "./structures";
+import {D_Point, NDArray, OneDArray, Quackable, QuackableV3, QuackAdd, QuackingV2} from "./structures";
+import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
+// import {matrix} from "mathjs";
+import {MathArray, multiply, qr} from "mathjs";
+import {NormalizeWithinPeriod} from "../angle/normalization";
 
 type StrIndexable  = {
   [index: string]: any;
@@ -18,27 +15,101 @@ function AllZeroArray(n : number) {
   }
   return allZeros;
 }
-// import {utils} from "../r_three";
-import {Accumulator, ForEachArrayIndex, ForEachObjectItem, FUNCAccumulatorSum} from "./functional";
-// import {matrix} from "mathjs";
-import {MathArray, qr, multiply} from "mathjs";
 
 //https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
-function Polar2Cartesian(r: number, radians: number): QuackingV2 {
+// Angle to coordinates
+function Polar2Cartesian(radius: number, radians: number, oppositeY : boolean = false): QuackingV2 {
+  let oppoY =radius * Math.sin(radians);
+  if (oppositeY) oppoY = -1 * oppoY;
   return {
-    x: r * Math.cos(radians),
-    y: r * Math.sin(radians)
+    x: radius * Math.cos(radians),
+    y: oppoY
   }
 }
 
 // x: number, y: number
-function Cartesian2Polar(xy: QuackingV2) {
-  return Math.atan2(xy.y, xy.x);
+// Similar to GetRad. Actually, the same.
+function Cartesian2Polar(xy: QuackingV2, oppositeY : boolean = false){
+  if (oppositeY) {
+    return Algebra.GetRad({
+      x: xy.x,
+      y: -xy.y
+    });
+  }
+  return Algebra.GetRad(xy);
 }
 
+// from 2 points, get the 2 angles, relative to itself.
+// actually the second angle is by default 0, 0
+function GetDoubleSidedDegreee(toPoint : QuackingV2, fromPoint : QuackingV2 = {x:0,y:0}) : [number, number] {
+  let quackingDifference = QuackAdd(toPoint, {x: -fromPoint.x, y: -fromPoint.y});
+  let oneDegree = Algebra.GetDegree(quackingDifference);
+  let otherDegree = NormalizeWithinPeriod(oneDegree + 180, -180, 180);
+  if (oneDegree * otherDegree > 0) {
+    console.log("These 2 degrees are supposed to be 1 positive and one negative but it's not " + oneDegree + " " + otherDegree);
+  }
+  if (oneDegree < 0) {
+    return [oneDegree, otherDegree];
+  }
+  return [otherDegree, oneDegree];
+}
+
+// Basis Angle
+class CAngle {
+  // By default, in angles, instead of radians
+  angle : number;
+  basis : number;
+  period : [number, number]
+  // Angle normalized range: -180 to 180.
+  constructor(angle : number = 0, basis : number = 0, period : number[] = [-180, 180]) {
+    this.angle = angle;
+    this.basis = basis;
+    if (period.length != 2) {
+      if (period.length != 0) console.log("There is some period defined but the length is not 2 (no from and to period)")
+      this.period = [-180, 180];
+    } else {
+      this.period = [period[0], period[1]];
+    }
+    // Unless you really want something that for ccw is cw, and cw is ccw
+    console.assert(this.period[0] < this.period[1]);
+    this.angle = this.normalizeOne(this.angle);
+  }
+
+  getComplementAngle() {
+    return this.normalizeOne(this.angle - (this.period[1] - this.period[0])/2);
+  }
+
+  normalizeOne(angle : number) {
+    return (NormalizeWithinPeriod(angle, this.period[0], this.period[1]));
+  }
+  toString() {
+    return `${this.angle.toFixed(1)}D, basis:${this.basis.toFixed(1)}`;
+  }
+
+  // if ccw, move in same direction
+  move(magnitudeDegree : number) {
+    // if first half of period, then move ...........................
+    // actually it's not very obvious.
+    let middle = (this.period[0] + this.period[1])/2;
+    // -180 to 0, is left part of period, it's clockwise
+    let angleInclinedLeftOrCW = this.angle < middle;
+    if (angleInclinedLeftOrCW) {
+      this.angle -= magnitudeDegree;
+    } else {
+      this.angle += magnitudeDegree;
+    }
+  }
+}
+
+
+/*
+1. Rays have direction
+2. When rays intersect, or lines intersect, split into 'from'  and 'to', 2 points.
+3. these 2 points and its intersection are on one line
+ */
 // can't do this 'specialization'
 // type ProjectArray = number[][2];
 
@@ -84,11 +155,36 @@ class Algebra {
     return Math.abs(x - y) < eps;
   }
 
+  // For 2D angles
+  static ConvertBasis(angle1 : CAngle , newBasis : number) {
+    return new CAngle(angle1.angle - (newBasis - angle1.basis), newBasis);
+  }
+
+  // -180, 180.
+  static DegreeComplement(deg : number) {
+    if (deg < 0) {
+      return -180 - deg;
+    } else {
+      return 180 - deg;
+    }
+  }
+  // Just 'frame' it against horizontal
+  // -PI is -180, so -180 to 180
+  // getdegree and atan2 gets diff results???
+  static GetDegree(vec : Quackable) {
+    return RAD2DEG * Algebra.GetRad(vec);
+  }
   /**
   Range:   [-π, π]
    */
+  // need to abstract away, see
+  /*
+        // it was easy to mix up direction and actual x,y coordinates. so you need to change this getrad y * -1 into a
+      // data structure that converts directions into xy coordinates.
+   */
+  //-1 *
   static GetRad(point: Quackable) {
-    return Math.atan2(-1 * point.y, point.x);
+    return Math.atan2(point.y, point.x);
   }
 
   /**
@@ -263,39 +359,26 @@ Array.prototype.reshape = function (rows, cols) {
 // Not tested yet
 const C_DOT = (a: Quackable, v: Quackable) => {
   let sum: number = 0;
-  let i = 0;
-  let reserveSpace: number[] = [];
-  ForEachObjectItem(a, (k: number) => {
-    reserveSpace.push(k);
-  });
-  ForEachObjectItem(v, (k: number) => {
-    if (i > reserveSpace.length)
-      return;
-    reserveSpace[i] *= k;
-    sum += reserveSpace[i];
-    i++;
-  });
+  sum = a.x * v.x + a.y * v.y;
+  if (QuackableV3(a) && a.z && QuackableV3(v) && v.z) {
+    sum += a.z * v.z;
+  }
   return sum;
 };
 
+// Convert array to x, y or x,y,z.
 // Vector perpendicular to the plane tha contains A & B. Magnitude is magA * magB * sin(theta)
-const C_CROSS = (a: Quackable, b: Quackable): Quackable => {
-  if (QuackableV3(a) && QuackableV3(b)) {
+const C_CROSS = (a: Quackable, b: Quackable): Quackable | number => {
+  // typescript is making another incorrect decision where the type is not quackablev3 but it acts as if it is
+  // if (QuackableV3(a) && QuackableV3(b)) {
+  if (QuackableV3(a) && a.z && QuackableV3(b) && b.z) {
     return new D_Point(
       a.y * b.z - a.z * b.y,
       a.z * b.x - a.x * b.z,
       a.x * b.y - a.y * b.x
     );
   }
-  return new D_Point(
-    a.x * b.y,
-    b.x * a.y);
-
-  // console.log(`debugging:
-  //   ${a.y*b.z} - ${a.z*b.y},
-  //   ${a.z*b.x} - ${a.x*b.z},
-  //   ${a.x*b.y}-${a.y*b.x}`);
-  // !a.zValid || !b.zValid
+  return a.x * b.y - a.y * b.x;
 };
 
 const C_DIST = (a: QuackingV2, v: QuackingV2) => {
@@ -404,6 +487,9 @@ export {
   Polar2Cartesian,
   Cartesian2Polar,
   AllZeroArray
+  ,
+  GetDoubleSidedDegreee,
+  CAngle
 };
 export type { StrIndexable };
 

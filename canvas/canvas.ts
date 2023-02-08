@@ -3,7 +3,7 @@ import {
   CanvasPassAlong,
   D_Rect,
   NDArray,
-  NormalizePoint,
+  NormalizePoint, Quackable,
   QuackingV2
 } from "../functions/structures";
 import { ColorConversions } from "../tools/color_conversions"
@@ -93,15 +93,19 @@ class R_Canvas extends CanvasPassAlong {
 
   // draw such that there are angle/degree markings around the circle
   // direction = reference 'forward' direction
-  cPlate(point: QuackingV2, direction : QuackingV2, magnitude : number = 10) {
+  cSpikes(point: QuackingV2, direction : QuackingV2, magnitude : number = 10) {
     for (let i = 0; i < 360; i += 30) {
-      let tick = Algebra.ProjectP(direction, magnitude, i);
+      let tickF = Algebra.ProjectP(direction, magnitude, i);
+      let tickT = Algebra.ProjectP(direction, magnitude*0.8, i);
       let col = ColorConversions.rgbToHex(40, 100+i/15, i/2);
-      let lw = 1;
+      let lw = 2;
       if (i == 0) {
         lw = 7;
       }
-      this.clineo(point, {x: point.x + tick.x, y: point.y + tick.y}, {fillStyle: col, debug: false, lineWidth: lw});
+      this.clineo(
+        {x: point.x + tickF.x, y: point.y + tickF.y},
+        {x: point.x + tickT.x, y: point.y + tickT.y},
+        {fillStyle: col, debug: false, lineWidth: lw});
     }
   }
 
@@ -317,6 +321,10 @@ class R_Canvas extends CanvasPassAlong {
     // @ts-ignore
     return math.matrix([[c, s, 0], [-s, c, 0], [0, 0, 1]]);
     // return math.matrix([[c,s,0],[-s,c,0],[0,0,1]]);
+  }
+
+  writeo(text: string, pt : Quackable) {
+    return this.write(text, pt.x, pt.y);
   }
 
   write(text: string, x: number, y: number) {

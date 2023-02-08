@@ -5,14 +5,18 @@ import {C_ARRAY_COPY, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
 // indicate clockwise and counter clockwise in some manner.
 
 // must not exceed 360, also when there are 2 ways..... 110--70 -> this is 180. -70 - 110, -110 - 70, 70 - -110
-let AngleDiff = (angle1 : number, angle2 : number) => {
-
+let AngleDiff = (angle1 : number, angle2 : number, from: number = -180, to: number = 180) => {
+  let normalized1 = NormalizeWithinPeriod(angle1, from, to);
+  let normalized2 = NormalizeWithinPeriod(angle2, from, to);
+  let normalized = NormalizeWithinPeriod(normalized1 - normalized2, from, to);
+  // console.log(normalized, (to - from) - normalized);
+  return Math.min(normalized, (to - from) - normalized);
 }
-// angle additiono???? -70 + 110,
+// angle addition???? -70 + 110,
 // it's almost like, + is undoing.
 // which means you either flip angles. or flip angles, never add them.
 
-let NormalizeWithinPeriod = (angle: number, from: number, to: number) => {
+let NormalizeWithinPeriod = (angle: number, from: number = -180, to: number = 180) => {
   let period = to - from;
   if (period < 0) {
     console.log(from, to, to - from, period);
@@ -56,7 +60,7 @@ let GetAngleRadian = (angleRes: number[]) => {
  * @param vec2
  * @constructor
  */
-//this is likse a global angle deg but i need the angle between 2 vectors not this......how 2 differentiate?
+//this is like a global angle deg but i need the angle between 2 vectors not this......how 2 differentiate?
 let RadDiff2D = (vec1: number[], vec2: number[]) => {
   // first you orthogonal the 2 angles, then you get the angle
   let angleRes = C_ARRAY_COPY(vec2);

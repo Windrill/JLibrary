@@ -7,7 +7,8 @@ export function getInstance<T extends Object>(type: (new (...args: any[]) => T),
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
-  // [index: number]: any
+  // [index: number]: any <- what's the reason I commented this out????? i was using it for
+  //const C_DOT = (a: Quackable, v: Quackable) => {
   x: number,
   y: number
 }
@@ -25,6 +26,13 @@ type Quackable = QuackingV2 | QuackingV3;
 const QuackableV2 = (x: Quackable): x is QuackingV2 => true;
 // @ts-ignore
 const QuackableV3 = (x: Quackable): x is QuackingV3 => true;
+
+function QuackAdd(x: QuackingV2, y: QuackingV2) {
+  return {
+    x: x.x + y.x,
+    y: x.y + y.y
+  };
+}
 
 interface WidthHeight {
   W: number,
@@ -386,5 +394,6 @@ export type {
 }
 
 export {
-  BackendType
+  BackendType,
+  QuackAdd
 }
