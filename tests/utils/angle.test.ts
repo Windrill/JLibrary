@@ -1,17 +1,9 @@
-import {NormalizeWithinPeriod} from "../../angle/normalization";
+import {AngleDiff, NormalizeWithinPeriod} from "../../angle/normalization";
 import {Algebra, C_CROSS, C_DOT, CAngle} from "../../functions/algebra";
 import {D_Point} from "../../functions/structures";
 
-let diffBtwnAngles = (angle1: number, angle2: number, from: number, to: number) => {
-  let normalized1 = NormalizeWithinPeriod(angle1, from, to);
-  let normalized2 = NormalizeWithinPeriod(angle2, from, to);
-  let normalized = NormalizeWithinPeriod(normalized1 - normalized2, from, to);
-  // console.log(normalized, (to - from) - normalized);
-  return Math.min(normalized, (to - from) - normalized);
-}
 describe('Angle Tests', () => {
-
-  test('Look at angle and intersection representations', () => {
+  test('Angle and intersection representations', () => {
     let lineC = [-22, -22];
     let lineA = [64, 64];
     let lineB = [0, 0]; // left to right.
@@ -88,45 +80,62 @@ describe('Angle Tests', () => {
     }
   });
 
-  test('Angle Normalization', () => {
-    expect(NormalizeWithinPeriod(-360, -180, 180) == 0);
-    expect(NormalizeWithinPeriod(36, -180, 180) == 36);
-    expect(NormalizeWithinPeriod(160, -180, 180) == 160);
-    expect(NormalizeWithinPeriod(360 + 160, -180, 180) == 160);
-    expect(NormalizeWithinPeriod(350 + 160, -180, 180) == 150);
-// console.log(
-//   normalizeWithinPeriod(-350+160, -180, 180)); // 36
-// console.log(
-//   normalizeWithinPeriod(361, -180, 180)); // 1
-// console.log(
-//   normalizeWithinPeriod(-361, -180, 180)); // -1
-// console.log(
-//   normalizeWithinPeriod(-180, -180, 180)); // -180
-// console.log(
-//   normalizeWithinPeriod(997, -180, 180)); // -180
-// console.log(
-//   normalizeWithinPeriod(0, -180, 180));
-// console.log(
-//   normalizeWithinPeriod(180, -180, 180));
-// console.log(
-//   normalizeWithinPeriod(181, -180, 180));
-// console.log(
-//   normalizeWithinPeriod(720, -360, 0));
-// console.log(
-//   normalizeWithinPeriod(-720, -360, 0));
+  test('Angle Conversion equasion...', () => {
+    let axisAngle = 23;
+    let degreeMarkBBorder = -167;
+    let boundaryTotoFromAngleB0 = 61;
+    let totalAngleB0 = NormalizeWithinPeriod(axisAngle + degreeMarkBBorder + boundaryTotoFromAngleB0);
+    let totalAngleCB0 = NormalizeWithinPeriod(new CAngle(axisAngle + degreeMarkBBorder, boundaryTotoFromAngleB0).convertBasis().angle);
+    // these 2 should be the same....
+    // For 2D angles
+    // static ConvertBasis(angle1 : CAngle , newBasis : number) {
+    //     return new CAngle(angle1.angle - (newBasis - angle1.basis), newBasis);
+    //   }
   });
 
+  test('Angle Normalization', () => {
+    expect(NormalizeWithinPeriod(-360, -180, 180)).toBe(0);
+    expect(NormalizeWithinPeriod(36, -180, 180)).toBe(36);
+    expect(NormalizeWithinPeriod(-350 + 160, -180, 180)).toBe(170);
+    expect(NormalizeWithinPeriod(361, -180, 180)).toBe(1);
+    expect(NormalizeWithinPeriod(-361, -180, 180)).toBe(-1);
+    expect(NormalizeWithinPeriod(181, -180, 180)).toBe(-179);
+    expect(NormalizeWithinPeriod(180, -180, 180)).toBe(180);
+    expect(NormalizeWithinPeriod(-180, -180, 180)).toBe(-180);
+    // Note that NormalizeWithinPeriod doesn't quite differentiate between the 2 ends of the period.
+    expect(NormalizeWithinPeriod(720, -360, 0)).toBe(-360);
+    expect(NormalizeWithinPeriod(360, -360, 0)).toBe(-360);
+    expect(NormalizeWithinPeriod(-720, -360, 0)).toBe(-360);
+    expect(NormalizeWithinPeriod(0, -180, 180)).toBe(0);
+    expect(NormalizeWithinPeriod(160, -180, 180)).toBe(160);
+    expect(NormalizeWithinPeriod(360 + 160, -180, 180)).toBe(160);
+    expect(NormalizeWithinPeriod(350 + 160, -180, 180)).toBe(150);
+  });
+  test("Angle Difference for 180 degrees", () => {
+    expect(AngleDiff(-120, 60, -180, 180)).toBe(-180);
+    expect(AngleDiff(240, 60, -180, 180)).toBe(-180);
+    expect(AngleDiff(60, -120, -180, 180)).toBe(180);
+    expect(AngleDiff(60, -480, -180, 180)).toBe(180);
+// hmm???? see 240, 60 == -180.
+    // got some errosr here that needs to be fixed.
+    expect(AngleDiff(239, 60, -180, 180)).toBe(179);
+    expect(AngleDiff(59, -480, -180, 180)).toBe(179);
+  });
   test("Angle Difference", () => {
-    expect(diffBtwnAngles(-20, 60, -180, 180) == -80);
-    expect(diffBtwnAngles(-120, 60, -180, 180) == -180);
-    expect(diffBtwnAngles(-220, 60, -180, 180) == 80);
-    expect(diffBtwnAngles(-0, 180, -180, 180) == -180);
-    expect(diffBtwnAngles(-0, 360, -180, 180) == 0);
-    expect(diffBtwnAngles(-20, 320, -180, 180) == -60);
-    expect(diffBtwnAngles(-20, 360, -180, 180) == -20);
-    expect(diffBtwnAngles(-20, -40, -180, 180) == -20);
-    expect(diffBtwnAngles(40, 80, -180, 180) == -40);
-    expect(diffBtwnAngles(-40, 180, -180, 180) == 140);
+    expect(AngleDiff(-20, 60, -180, 180)).toBe(-80);
+    expect(AngleDiff(-220, 60, -180, 180)).toBe(80);
+    expect(AngleDiff(-0, 180, -180, 180)).toBe(-180);
+    expect(AngleDiff(-0, 360, -180, 180)).toBe(-0);
+
+    expect(AngleDiff(-20, 320, 0, 360)).toBe(20); // Distance when drawn around the circle in quadrant, is this
+    expect(AngleDiff(-20, 320, -180, 180)).toBe(20);
+
+    expect(AngleDiff(-20, -40, -180, 180)).toBe(20);
+    // Big to small = difference is +
+    expect(AngleDiff(40, 80, -180, 180)).toBe(-40);
+    expect(AngleDiff(80, 40, -180, 180)).toBe(40);
+
+    expect(AngleDiff(-40, 180, -180, 180)).toBe(140);
   });
 
   test("Dot Products", () => {
@@ -185,4 +194,4 @@ describe('Angle Tests', () => {
       expect(crossProduct).toStrictEqual(new D_Point(27, -13.5, 0));
     }
   });
-  });
+});

@@ -9,6 +9,7 @@ import {
 import { ColorConversions } from "../tools/color_conversions"
 import {Algebra, DEG2RAD} from "../functions/algebra";
 import {DrawSettings} from "./draw_settings";
+import {Style} from "util";
 
 
 // Options settings....
@@ -39,6 +40,27 @@ function initDrawStyle(options?: Partial<DrawStyle>): DrawStyle {
 }
 
 // Have an object supply default values for this interface.
+
+
+type StyleType = {fillStyle: string,
+  debug: boolean, lineWidth: number};
+
+// Default styles!
+let CStyles = {
+   defaultLine: {
+     fillStyle: "#000000",
+     debug: false,
+     lineWidth: 1
+   },
+  brightGreen: {fillStyle: "#31d08e", debug: false, lineWidth: 4},
+  darkGreen: {fillStyle: "#365c4c", debug: false, lineWidth: 3},
+  redThick: {fillStyle: "#d03131", debug: false, lineWidth: 19},
+  orange: {fillStyle: "#d07931", debug: false, lineWidth: 7},
+  orangeThick: {fillStyle: "#d07931", debug: false, lineWidth: 17},
+  blue: {fillStyle: "#126cb4", debug: false, lineWidth: 3},
+  purple: {fillStyle: "#6c40d5", debug: false, lineWidth: 5}
+  //{fillStyle: "#126cb4", debug: false, lineWidth: 2}
+}
 
 
 // No such thing as 'drawing context', more generic. with geometric and other shapes.
@@ -77,7 +99,6 @@ class R_Canvas extends CanvasPassAlong {
       y: point.y + normDirection.y * magnitude
     };
     this.cline(point.x, point.y, endOfLine.x, endOfLine.y, Args[0]);
-    //{fillStyle: "#126cb4", debug: false, lineWidth: 2}
     let arrowFlapFromTrunk = magnitude / 5;
 
 
@@ -109,13 +130,9 @@ class R_Canvas extends CanvasPassAlong {
     }
   }
 
-  // const DefaultCircleDrawSettings : DrawSettings = {
-  //
-  // };
   // cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
 // , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
   cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
-
     this.context.ctx.beginPath();
     this.context.ctx.fillStyle = drawSettings.color;
     this.context.ctx.arc(point.x, point.y, drawSettings.radius, drawSettings.startAngle, drawSettings.endAngle);
@@ -132,13 +149,13 @@ class R_Canvas extends CanvasPassAlong {
   }
 
   // Change to points.
-  cngon(listOfPoints: number[], {fillStyle, debug} = {fillStyle: "#000000", debug: false}) {
+  cngon(listOfPoints: number[], style : StyleType = CStyles.defaultLine) {
     listOfPoints.push(listOfPoints[0]);
     listOfPoints.push(listOfPoints[1]);
-    if (debug) {
+    if (style.debug) {
       console.log("Ngon is OK");
     }
-    this.context.ctx.fillStyle = fillStyle;
+    this.context.ctx.fillStyle = style.fillStyle;
     this.context.ctx.beginPath();
     for (let i = 0; i < listOfPoints.length - 2; i += 2) {
       this.context.ctx.moveTo(listOfPoints[i], listOfPoints[i + 1]);
@@ -148,30 +165,22 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
-  clineo(first: QuackingV2, second: QuackingV2, {fillStyle, debug, lineWidth} = {
-    fillStyle: "#000000",
-    debug: false,
-    lineWidth: 1
-  }) {
-  return this.cline(first.x, first.y, second.x, second.y, {fillStyle, debug, lineWidth});
+  clineo(first: QuackingV2, second: QuackingV2, cstyle : StyleType = CStyles.defaultLine) {
+  return this.cline(first.x, first.y, second.x, second.y, cstyle);
   }
 
   // Slowly remove this
   // TODO: Organize styles and document, fix it such that these options are optional
   // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
   // cline<T>(a: T, b: T, x: T, y: T, {fillStyle, debug, lineWidth} = {
-    cline(a: number, b: number, x: number, y: number, {fillStyle, debug, lineWidth} = {
-    fillStyle: "#000000",
-    debug: false,
-    lineWidth: 1
-  }) {
-    if (debug) {
+    cline(a: number, b: number, x: number, y: number, style : StyleType = CStyles.defaultLine) {
+    if (style.debug) {
       console.log(`${a},${b} to ${x},${y}`);
     }
-    this.context.ctx.lineWidth = lineWidth;
-    this.context.ctx.fillStyle = fillStyle;
+    this.context.ctx.lineWidth = style.lineWidth;
+    this.context.ctx.fillStyle = style.fillStyle;
     // TODO, make more proper
-    this.context.ctx.strokeStyle = fillStyle;
+    this.context.ctx.strokeStyle = style.fillStyle;
     this.context.ctx.beginPath();
     this.context.ctx.moveTo(a, b);
     this.context.ctx.lineTo(x, y);
@@ -180,11 +189,7 @@ class R_Canvas extends CanvasPassAlong {
   }
 
   // structures.ts D_Rect also has one
-  crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = {
-    fillStyle: "#000000",
-    debug: false,
-    lineWidth: 1
-  }) {
+  crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = CStyles.defaultLine) {
     if (debug) {
       console.log("Debugging crect");
     }
@@ -196,12 +201,8 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
-  crectd(drect : D_Rect, {fillStyle, debug, lineWidth} = {
-    fillStyle: "#000000",
-    debug: false,
-    lineWidth: 1
-  }) {
-    this.crect(drect.x, drect.y, drect.width, drect.height, {fillStyle, debug, lineWidth});
+  crectd(drect : D_Rect, cstyle : StyleType = CStyles.defaultLine) {
+    this.crect(drect.x, drect.y, drect.width, drect.height, cstyle);
   }
 
   // ?? See MidPointToBottomLeft, structures.ts
@@ -338,4 +339,9 @@ class R_Canvas extends CanvasPassAlong {
 
 export {
   R_Canvas,
+  CStyles
+}
+
+export type {
+  StyleType
 }

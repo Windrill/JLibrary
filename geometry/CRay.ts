@@ -24,8 +24,6 @@ class CRay {
     let relativeDirection = Polar2Cartesian(1, radians);
     this.direction = new THREE.Vector2(relativeDirection.x, relativeDirection.y);
     this.drawDebug = true;
-    // this.direction = new THREE.Vector2(0,1);
-    // this.direction = new THREE.Vector2(0,-1);
   }
 
   toString() {

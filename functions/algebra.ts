@@ -30,6 +30,20 @@ function Polar2Cartesian(radius: number, radians: number, oppositeY : boolean = 
   }
 }
 
+function CoordinateToDirection (coord : QuackingV2) {
+  return {
+    x: coord.x,
+    y: -coord.y
+  }
+}
+
+// For flipping directions to represent the opposite direction
+function DirectionFlip (coord : QuackingV2) {
+  return {
+    x: -coord.x,
+    y: -coord.y
+  }
+}
 // x: number, y: number
 // Similar to GetRad. Actually, the same.
 function Cartesian2Polar(xy: QuackingV2, oppositeY : boolean = false){
@@ -44,7 +58,7 @@ function Cartesian2Polar(xy: QuackingV2, oppositeY : boolean = false){
 
 // from 2 points, get the 2 angles, relative to itself.
 // actually the second angle is by default 0, 0
-function GetDoubleSidedDegreee(toPoint : QuackingV2, fromPoint : QuackingV2 = {x:0,y:0}) : [number, number] {
+function GetDoubleSidedDegree(toPoint : QuackingV2, fromPoint : QuackingV2 = {x:0,y:0}) : [number, number] {
   let quackingDifference = QuackAdd(toPoint, {x: -fromPoint.x, y: -fromPoint.y});
   let oneDegree = Algebra.GetDegree(quackingDifference);
   let otherDegree = NormalizeWithinPeriod(oneDegree + 180, -180, 180);
@@ -87,6 +101,10 @@ class CAngle {
   }
   toString() {
     return `${this.angle.toFixed(1)}D, basis:${this.basis.toFixed(1)}`;
+  }
+
+  convertBasis(otherBasis : number = 0) {
+    return Algebra.ConvertBasis(this, otherBasis);
   }
 
   // if ccw, move in same direction
@@ -183,7 +201,12 @@ class Algebra {
       // data structure that converts directions into xy coordinates.
    */
   //-1 *
-  static GetRad(point: Quackable) {
+  // Opposite Y only when the coordinates you provide are 'absolute' values instead
+  // of change/difference between 2 positions
+  static GetRad(point: Quackable, oppositeY : boolean = false) {
+    if (oppositeY) {
+
+    }
     return Math.atan2(point.y, point.x);
   }
 
@@ -486,9 +509,10 @@ export {
 
   Polar2Cartesian,
   Cartesian2Polar,
+  DirectionFlip,
   AllZeroArray
   ,
-  GetDoubleSidedDegreee,
+  GetDoubleSidedDegree,
   CAngle
 };
 export type { StrIndexable };

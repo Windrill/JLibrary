@@ -1,9 +1,15 @@
 import {C_ARRAY_COPY} from "./algebra";
 import {R_Canvas} from "../canvas/canvas";
 import {DrawSettings} from "../canvas/draw_settings";
+
 export function getInstance<T extends Object>(type: (new (...args: any[]) => T), ...args: any[]): T {
   return new type(...args);
 }
+
+let DEFAULT2D: QuackingV2 = {
+  x: 0, y: 0
+};
+
 
 // Quacking Vector2: It quacks like a D_Point and also like a THREE.Vector2
 interface QuackingV2 {
@@ -31,6 +37,25 @@ function QuackAdd(x: QuackingV2, y: QuackingV2) {
   return {
     x: x.x + y.x,
     y: x.y + y.y
+  };
+}
+function QuackMultiply(x: QuackingV2, y: QuackingV2) {
+  return {
+    x: x.x * y.x,
+    y: x.y * y.y
+  };
+}
+
+function QuackSubtract(x: QuackingV2, y: QuackingV2) {
+  return {
+    x: x.x - y.x,
+    y: x.y - y.y
+  };
+}
+function QuackScalar(s : number) {
+  return {
+    x: s,
+    y: s
   };
 }
 
@@ -316,6 +341,7 @@ function NormalizeX(...args: number[]): number[] {
   return ret;
 }
 
+// TODO: Fix normalization, doesn't seem to draw a consistent angle????
 function NormalizePoint(p: QuackingV2 | QuackingV3) {
   let mag = Math.sqrt(p.x * p.x + p.y * p.y);
   return {
@@ -348,10 +374,19 @@ const singleDimensional = (x: any): x is OneDArray => x.length && !(x[0].length)
 type Pair = [number, number];
 type NDPair = Pair | [number[], number[]];
 
+// Canvas
 export {
-  D_Rect
+  D_Rect,
+  D_Point,
+  D_Circle,
+  multiDimensional,
+  singleDimensional,
+  NormalizePoint,
+  NormalizeX,
+
 }
 
+// Arrays, data structures
 export type {
   ZeroOrOneD,
   OneDArray,
@@ -365,26 +400,23 @@ export type {
   SI_Object
 }
 
-export {
-  D_Point,
-  D_Circle,
-  multiDimensional,
-  singleDimensional,
-  NormalizePoint,
-  NormalizeX,
 
-}
+// Midpoint functions
 export {
   MidPointToTopLeft,
   MidPointToBottomLeft,
   MidPointToTopLeftBoxTuple
 }
 
+// Types
 export {
   CanvasPassAlong,
   QuackableV2,
-  QuackableV3
+  QuackableV3,
+  DEFAULT2D
 }
+
+// Structures
 export type {
   QuackingV2,
   QuackingV3,
@@ -393,7 +425,11 @@ export type {
   D_Line
 }
 
+// Helper functions
 export {
   BackendType,
-  QuackAdd
+  QuackAdd,
+  QuackSubtract,
+  QuackScalar,
+  QuackMultiply
 }

@@ -1,11 +1,13 @@
 import {C_ARRAY_COPY, C_ARRAY_ELEMENT_SUB} from "../functions/algebra";
 
-// angle subtraction:
-// 30 - 40 vs 40 - 30 degrees must be different.
-// indicate clockwise and counter clockwise in some manner.
-
+/*
+Angle difference in real geometric scenario, which is different from number lines.
+ */
+// looks at the closest route! if the difference is 180 degrees...bigger, smaller = negative
+// actually for regular scenarios, big, smaller = positive difference.......................... : (
+//
 // must not exceed 360, also when there are 2 ways..... 110--70 -> this is 180. -70 - 110, -110 - 70, 70 - -110
-let AngleDiff = (angle1 : number, angle2 : number, from: number = -180, to: number = 180) => {
+let AngleDiff = (angle1: number, angle2: number, from: number = -180, to: number = 180) => {
   let normalized1 = NormalizeWithinPeriod(angle1, from, to);
   let normalized2 = NormalizeWithinPeriod(angle2, from, to);
   let normalized = NormalizeWithinPeriod(normalized1 - normalized2, from, to);
@@ -65,11 +67,10 @@ let RadDiff2D = (vec1: number[], vec2: number[]) => {
   // first you orthogonal the 2 angles, then you get the angle
   let angleRes = C_ARRAY_COPY(vec2);
   C_ARRAY_ELEMENT_SUB(angleRes, vec1);
-console.log(vec1, vec2, angleRes);
+  console.log(vec1, vec2, angleRes);
   return GetAngleRadian(angleRes);
   // then add angle1's angle to??
 }
-
 
 export {
   NormalizeWithinPeriod,
