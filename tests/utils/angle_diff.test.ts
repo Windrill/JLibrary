@@ -1,3 +1,4 @@
+import * as THREE from 'three'
 
 // 160 and -20
 // 110 and -70

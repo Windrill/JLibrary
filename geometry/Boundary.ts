@@ -5,6 +5,7 @@ import {C_CROSS} from "../functions/algebra";
 import {Listener} from "../canvas/canvas_listener";
 import {CanvasContext} from "../functions/structures";
 import {ForEachArrayItem} from "../functions/functional";
+import {CLineDrawSettings, LinesDrawSettings} from "../canvas/draw_settings";
 
 // For example, the midpoint on which boundary line will be computed & redrawn upon.
 type GenericContext = {
@@ -51,11 +52,7 @@ class Boundary extends CObject {
   }
 
   draw(canvas : R_Canvas) {
-    canvas.cline(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y, {
-      fillStyle: "#167a7a",
-      lineWidth: 8,
-      debug: false
-    });
+    canvas.cline(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y, CLineDrawSettings.gblue);
   }
 
   drawDirection(canvas : R_Canvas) {

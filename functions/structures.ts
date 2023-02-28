@@ -1,6 +1,6 @@
 import {C_ARRAY_COPY} from "./algebra";
 import {R_Canvas} from "../canvas/canvas";
-import {DrawSettings} from "../canvas/draw_settings";
+import {PointDrawSettings} from "../canvas/draw_settings";
 
 export function getInstance<T extends Object>(type: (new (...args: any[]) => T), ...args: any[]): T {
   return new type(...args);
@@ -33,6 +33,9 @@ const QuackableV2 = (x: Quackable): x is QuackingV2 => true;
 // @ts-ignore
 const QuackableV3 = (x: Quackable): x is QuackingV3 => true;
 
+function Quack2(x : number, y : number) {
+  return {x: x, y: y};
+}
 function QuackAdd(x: QuackingV2, y: QuackingV2) {
   return {
     x: x.x + y.x,
@@ -44,6 +47,9 @@ function QuackMultiply(x: QuackingV2, y: QuackingV2) {
     x: x.x * y.x,
     y: x.y * y.y
   };
+}
+function QuackCopy(a : QuackingV2) {
+  return {x: a.x, y: a.y};
 }
 
 function QuackSubtract(x: QuackingV2, y: QuackingV2) {
@@ -282,21 +288,21 @@ class D_Circle {
 
   display(rCanvas: R_Canvas) {
     rCanvas.cpoint({x: this.x, y: this.y},
-      new DrawSettings({
+      new PointDrawSettings({
         name: this.name,
         radius: this.radius,
-        startAngle: 0, endAngle: 360, _anticlockwise: false, color: this.color
+        startAngle: 0, endAngle: 360, _anticlockwise: false, fillStyle: this.color
       })
     );
     if (this.hover) {
       rCanvas.cpoint({x: this.x, y: this.y},
-        new DrawSettings({
+        new PointDrawSettings({
           name: this.name,
           radius: this.radius - 2,
           startAngle: 0,
           endAngle: 360,
           _anticlockwise: false,
-          color: "#ffffff"
+          fillStyle: "#ffffff"
         }));
     }
   }
@@ -429,7 +435,9 @@ export type {
 export {
   BackendType,
   QuackAdd,
+  Quack2,
   QuackSubtract,
   QuackScalar,
-  QuackMultiply
+  QuackMultiply,
+  QuackCopy
 }

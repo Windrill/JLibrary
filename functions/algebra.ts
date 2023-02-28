@@ -4,6 +4,7 @@ import {Accumulator, ForEachArrayIndex, FUNCAccumulatorSum} from "./functional";
 import {MathArray, multiply, qr} from "mathjs";
 import {NormalizeWithinPeriod} from "../angle/normalization";
 
+// String Indexable
 type StrIndexable  = {
   [index: string]: any;
 };

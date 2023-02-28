@@ -16,7 +16,7 @@ class GridArea {
     this.gridMap = {};
     this.gridList = [];
   }
-  addArea(areaNum: [], approx = 1) {
+  addArea(_areaNum: [], _approx = 1) {
     /*
     1. insert in the xth position
     2. expand with approximation value

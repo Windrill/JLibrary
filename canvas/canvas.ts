@@ -3,72 +3,127 @@ import {
   CanvasPassAlong,
   D_Rect,
   NDArray,
-  NormalizePoint, Quackable,
-  QuackingV2
+  NormalizePoint, Quackable, QuackAdd, QuackCopy,
+  QuackingV2, QuackMultiply, QuackScalar, QuackSubtract
 } from "../functions/structures";
-import { ColorConversions } from "../tools/color_conversions"
+import {ColorConversions} from "../tools/color_conversions"
 import {Algebra, DEG2RAD} from "../functions/algebra";
-import {DrawSettings} from "./draw_settings";
-import {Style} from "util";
+import {
+  CPoints,
+  CStyles,
+  DrawSettings,
+  LinesDrawSettings,
+  PointDrawSettings,
+  SessionDrawSettings,
+  StyleType
+} from "./draw_settings";
+import {ForEachArrayItem} from "../functions/functional";
 
-
-// Options settings....
-interface DrawStyle {
-  fillStyle: string;
-  strokeStyle: string;
-  fontStyle: string;
-  debug: boolean;
-  lineWidth: number;
-  textStyle: string;
+// return a normal endpoint & the process...
+// 0 is just once
+// for non-differentiate between 1d, 2d and 3d, i need to override operator
+// TODO: change or add a function to lerp all at once .just do a quick one for 1 value only.
+function lerp2D(a: QuackingV2, b: QuackingV2, num: number = 0, scale : number = 0.5) {
+  let diff = QuackSubtract(b, a);
+  if (num == 0) {
+    return [QuackAdd(QuackMultiply(diff, QuackScalar(scale)), a)];
+  }
+  let quackResult = [];
+  let scalarMultiplied = QuackMultiply(a, QuackScalar(1));
+  let diffDiv = QuackMultiply(diff, QuackScalar(num + 1));
+  for (let n = 0; n < num; n++) {
+    scalarMultiplied = QuackAdd(diffDiv, scalarMultiplied);
+    quackResult.push(QuackCopy(scalarMultiplied));
+  }
+  return quackResult;
 }
 
-function initDrawStyle(options?: Partial<DrawStyle>): DrawStyle {
-  const defaults = {
-    // fillStyle: "#61adc4",
-    fillStyle: "#000000",
-    strokeStyle: "#ffffff",
-    fontStyle: "16px serif",
-    debug: false,
-    lineWidth: 1,
-    textStyle: "#bd9696",
-  };
-
-  return {
-    ...defaults,
-    ...options,
-  };
+// Crisscross insertion: eg. from array of a, b, c, d and 1, 2, 3,4 get a, 1, b, 2, 3, c, 4, d
+// left on top
+function crissCross(left: any[], right: any[]) {
+  let returnCC = [];
+  let less = left.length < right.length ? left : right;
+  let more = left.length < right.length ? right : left;
+  for (let i = 0; i < less.length; i++) {
+    returnCC.push(left[i]);
+    returnCC.push(right[i]);
+  }
+  returnCC = returnCC.concat(more.slice(less.length));
+  return returnCC;
 }
 
-// Have an object supply default values for this interface.
-
-
-type StyleType = {fillStyle: string,
-  debug: boolean, lineWidth: number};
-
-// Default styles!
-let CStyles = {
-   defaultLine: {
-     fillStyle: "#000000",
-     debug: false,
-     lineWidth: 1
-   },
-  brightGreen: {fillStyle: "#31d08e", debug: false, lineWidth: 4},
-  darkGreen: {fillStyle: "#365c4c", debug: false, lineWidth: 3},
-  redThick: {fillStyle: "#d03131", debug: false, lineWidth: 19},
-  orange: {fillStyle: "#d07931", debug: false, lineWidth: 7},
-  orangeThick: {fillStyle: "#d07931", debug: false, lineWidth: 17},
-  blue: {fillStyle: "#126cb4", debug: false, lineWidth: 3},
-  purple: {fillStyle: "#6c40d5", debug: false, lineWidth: 5}
-  //{fillStyle: "#126cb4", debug: false, lineWidth: 2}
+// Example: 0, 300   - 100, 0   - 200, 300 becomes 0,300 - 50,150 - 150, 150- 200,300.
+// it's like a smooth with endpoints kept intact.
+function middleSmoothing (curveComp: any[]) {
+  return [curveComp[0]].concat(getMiddle(curveComp)).concat([curveComp[curveComp.length-1]]);
 }
 
+function getMiddle(curveComp: any[], scale : number = 0.5) {
+  let mids = [];
+  for (let i = 0; i < curveComp.length - 1; i++) {
+    mids.push(lerp2D(curveComp[i], curveComp[i + 1], 0, scale)[0]);
+  }
+  return mids;
+}
 
 // No such thing as 'drawing context', more generic. with geometric and other shapes.
 class R_Canvas extends CanvasPassAlong {
-  public styles : DrawStyle;
+  public styles: SessionDrawSettings;
+
   constructor(context: CanvasContext) {
     super(context);
-    this.styles = initDrawStyle();
+    this.styles = new SessionDrawSettings();
+  }
+
+// double lerp.
+  ccurve(from: QuackingV2, mid: QuackingV2, to: QuackingV2) {
+    let curveComp = [from, mid, to];
+    let colors = [
+      CPoints.green1,
+      CPoints.green2,
+      CPoints.green3
+    ];
+    ForEachArrayItem((c: QuackingV2) => {
+      this.cpoint(c, CPoints.red);
+    }, curveComp);
+    console.log(curveComp);
+    // 3
+    // first you hack a bezier curve i guess.
+    for (let i = 0; i < 1; i++) {
+      let mixedIn = ([curveComp[0]]).concat(getMiddle(curveComp)).concat([curveComp[curveComp.length - 1]]);
+      // let mixedIn = crissCross(curveComp, getMiddle(curveComp));
+      console.log(mixedIn);
+      ForEachArrayItem((point: QuackingV2) => {
+        console.log(`R${i} drawing:{x${point.x},y${point.y}}`);
+        //CStyles.defaultLine
+        this.cpoint(point, colors[i]);
+      }, mixedIn);
+      curveComp = mixedIn;
+    }
+    // bezier for curveComp!
+  }
+
+  drawBezier(controlPoints : QuackingV2[], sessionDrawSettings : SessionDrawSettings = this.styles) {
+    // I guess you also have specific types of draw, for example: bezier has options like
+    // draw an extra point or not. But for this you need to have a 'custom field' (note: field)
+    let lastPoint = undefined;
+    let step = 0.05;
+    let curr = 0;
+    for (let i = curr; i < 1; i+=step) {
+      // Calculate the step for each point!
+
+      // dont include the side-most 2 points, just include the middle ones.
+      let middles = getMiddle(controlPoints, i);
+      while(middles.length > 1) {
+        middles = getMiddle(middles, i);
+      }
+      if (lastPoint) {
+        this.clineo(lastPoint, middles[0], sessionDrawSettings.lds);
+      }
+      // How to transfer drawSettings like you do with all graphs?
+      // this.cpoint(middles[0], sessionDrawSettings.pds);
+      lastPoint = middles[0];
+    }
   }
   //easy project first x/z, y/z
   // CameraProjection(point: D_Point) {
@@ -82,43 +137,42 @@ class R_Canvas extends CanvasPassAlong {
       y: bTo.y - bFrom.y
     };
     // magnitude and squareroot function here
-    this.carrow(bFrom, quackDiff, Math.sqrt(quackDiff.x*quackDiff.x+quackDiff.y*quackDiff.y), ...Args);
+    this.carrow(bFrom, quackDiff, Math.sqrt(quackDiff.x * quackDiff.x + quackDiff.y * quackDiff.y), ...Args);
   }
 
-    /**
+  /**
    * 1 is down, -1 is up
    * @param point: from location
    * @param direction: a ratio, magnitude is not referenced in this direction
    * @param magnitude
-   * @param Args
+   * @param linesDrawSettings
    */
-  carrow(point: QuackingV2, direction: QuackingV2, magnitude: number, ...Args: any) {
+  carrow(point: QuackingV2, direction: QuackingV2, magnitude: number, linesDrawSettings : LinesDrawSettings = this.styles.lds) {
     let normDirection = NormalizePoint(direction);
     let endOfLine = {
       x: point.x + normDirection.x * magnitude,
       y: point.y + normDirection.y * magnitude
     };
-    this.cline(point.x, point.y, endOfLine.x, endOfLine.y, Args[0]);
+    this.cline(point.x, point.y, endOfLine.x, endOfLine.y, linesDrawSettings);
     let arrowFlapFromTrunk = magnitude / 5;
 
 
     // let flapHorizontalLength = Math.tan(DEG2RAD * 40) * arrowFlapFromTrunk;
     // how to draw this line perpendicular from the main line
     let topFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, 40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, Args[0]);
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - topFlap.x, endOfLine.y - topFlap.y, linesDrawSettings);
 
     let bottomFlap = Algebra.ProjectP(direction, arrowFlapFromTrunk, -40);
-    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y, Args[0]
-    );
+    this.cline(endOfLine.x, endOfLine.y, endOfLine.x - bottomFlap.x, endOfLine.y - bottomFlap.y, linesDrawSettings);
   }
 
   // draw such that there are angle/degree markings around the circle
   // direction = reference 'forward' direction
-  cSpikes(point: QuackingV2, direction : QuackingV2, magnitude : number = 10) {
+  cSpikes(point: QuackingV2, direction: QuackingV2, magnitude: number = 10) {
     for (let i = 0; i < 360; i += 30) {
       let tickF = Algebra.ProjectP(direction, magnitude, i);
-      let tickT = Algebra.ProjectP(direction, magnitude*0.8, i);
-      let col = ColorConversions.rgbToHex(40, 100+i/15, i/2);
+      let tickT = Algebra.ProjectP(direction, magnitude * 0.8, i);
+      let col = ColorConversions.rgbToHex(40, 100 + i / 15, i / 2);
       let lw = 2;
       if (i == 0) {
         lw = 7;
@@ -126,30 +180,36 @@ class R_Canvas extends CanvasPassAlong {
       this.clineo(
         {x: point.x + tickF.x, y: point.y + tickF.y},
         {x: point.x + tickT.x, y: point.y + tickT.y},
-        {fillStyle: col, debug: false, lineWidth: lw});
+        // create using optional.
+        new LinesDrawSettings({strokeStyle: col, debug: false, lineWidth: lw})
+      );
     }
   }
 
-  // cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
-// , radius : number = 5, startAngle : number = 0, endAngle : number = Math.PI*2
-  cpoint(point: QuackingV2, drawSettings: DrawSettings = new DrawSettings()) {
+  cpoint(point: QuackingV2, drawSettings: PointDrawSettings = this.styles.pds) {
     this.context.ctx.beginPath();
-    this.context.ctx.fillStyle = drawSettings.color;
+    this.context.ctx.fillStyle = drawSettings.fillStyle;
     this.context.ctx.arc(point.x, point.y, drawSettings.radius, drawSettings.startAngle, drawSettings.endAngle);
     this.context.ctx.fill();
-    if (drawSettings.name != "") {
-      this.write(drawSettings.name, point.x - 10, point.y - 10);
+    let message = drawSettings.name;
+    if (drawSettings.debug) {
+      if (message != "") {
+        message += " ";
+      }
+      message += `(${(point.x).toFixed()},${(point.y).toFixed()})`;
     }
-
+    if (message != "") {
+      this.write(message, point.x - 10, point.y - 10);
+    }
     this.context.ctx.closePath();
   }
 
-  cpoint_offset(x: number,y: number, point: QuackingV2) {
+  cpoint_offset(x: number, y: number, point: QuackingV2) {
     this.cpoint({x: point.x + x, y: point.y + y});
   }
 
   // Change to points.
-  cngon(listOfPoints: number[], style : StyleType = CStyles.defaultLine) {
+  cngon(listOfPoints: number[], style: LinesDrawSettings = this.styles.lds) {
     listOfPoints.push(listOfPoints[0]);
     listOfPoints.push(listOfPoints[1]);
     if (style.debug) {
@@ -165,22 +225,22 @@ class R_Canvas extends CanvasPassAlong {
     this.context.ctx.closePath();
   }
 
-  clineo(first: QuackingV2, second: QuackingV2, cstyle : StyleType = CStyles.defaultLine) {
-  return this.cline(first.x, first.y, second.x, second.y, cstyle);
+  clineo(first: QuackingV2, second: QuackingV2, cstyle: LinesDrawSettings = this.styles.lds) {
+    return this.cline(first.x, first.y, second.x, second.y, cstyle);
   }
 
   // Slowly remove this
   // TODO: Organize styles and document, fix it such that these options are optional
   // {fillStyle: "#126cb4", debug: false, lineWidth: 2}
   // cline<T>(a: T, b: T, x: T, y: T, {fillStyle, debug, lineWidth} = {
-    cline(a: number, b: number, x: number, y: number, style : StyleType = CStyles.defaultLine) {
-    if (style.debug) {
+  cline(a: number, b: number, x: number, y: number, lineStyle: LinesDrawSettings = this.styles.lds) {
+    if (lineStyle.debug) {
       console.log(`${a},${b} to ${x},${y}`);
     }
-    this.context.ctx.lineWidth = style.lineWidth;
-    this.context.ctx.fillStyle = style.fillStyle;
-    // TODO, make more proper
-    this.context.ctx.strokeStyle = style.fillStyle;
+    this.context.ctx.lineWidth = lineStyle.lineWidth;
+    this.context.ctx.fillStyle = lineStyle.fillStyle;
+    this.context.ctx.strokeStyle = lineStyle.strokeStyle;
+
     this.context.ctx.beginPath();
     this.context.ctx.moveTo(a, b);
     this.context.ctx.lineTo(x, y);
@@ -189,20 +249,20 @@ class R_Canvas extends CanvasPassAlong {
   }
 
   // structures.ts D_Rect also has one
-  crect(a: number, b: number, w: number, h: number, {fillStyle, debug, lineWidth} = CStyles.defaultLine) {
-    if (debug) {
+  crect(a: number, b: number, w: number, h: number, lineDrawSettings : LinesDrawSettings = this.styles.lds) {
+    if (lineDrawSettings.debug) {
       console.log("Debugging crect");
     }
     this.context.ctx.beginPath();
-    this.context.ctx.fillStyle = fillStyle;
-    this.context.ctx.lineWidth = lineWidth;
+    this.context.ctx.fillStyle = lineDrawSettings.fillStyle;
+    this.context.ctx.lineWidth = lineDrawSettings.lineWidth;
     this.context.ctx.rect(a, b, w, h);
     this.context.ctx.fill();
     this.context.ctx.closePath();
   }
 
-  crectd(drect : D_Rect, cstyle : StyleType = CStyles.defaultLine) {
-    this.crect(drect.x, drect.y, drect.width, drect.height, cstyle);
+  crectd(drect: D_Rect, lineDrawSettings : LinesDrawSettings = this.styles.lds) {
+    this.crect(drect.x, drect.y, drect.width, drect.height, lineDrawSettings);
   }
 
   // ?? See MidPointToBottomLeft, structures.ts
@@ -229,9 +289,10 @@ class R_Canvas extends CanvasPassAlong {
       }
     // this.ctx.fillStyle = "#1e7cea";
     // this.ctx.fillRect(0, 0, width, height);
-    this.context.ctx.font = this.styles.fontStyle;
-    this.context.ctx.fillStyle = this.styles.fillStyle;
-    this.context.ctx.strokeStyle = this.styles.strokeStyle;
+    this.context.ctx.font = this.styles.commonStyles.fontStyle;
+    this.context.ctx.fillStyle = this.styles.commonStyles.fillStyle;
+    // this.context.ctx.fillStyle = this.styles.lds.fillStyle;
+    this.context.ctx.strokeStyle = this.styles.commonStyles.strokeStyle;
     this.cline(drawRect.x - spacing, drawRect.y, drawRect.x + drawRect.width - spacing, drawRect.y);
     this.cline(drawRect.x, drawRect.y - spacing, drawRect.x, drawRect.y + drawRect.height - spacing);
     // TODO: Add axis labels
@@ -280,20 +341,17 @@ class R_Canvas extends CanvasPassAlong {
       this.clear(new D_Rect(0, 0, width, height));
     }
 
-    // this.context.ctx.fillStyle = this.styles.fillStyle;
-    // this.context.ctx.strokeStyle = this.styles.strokeStyle;
-    // this.context.ctx.font = this.styles.fontStyle;
-    this.cline(0, 5, width, 5, this.styles);
-    this.cline(5, 0, 5, height, this.styles);
+    this.cline(0, 5, width, 5, this.styles.lds);
+    this.cline(5, 0, 5, height, this.styles.lds);
     for (let i = 0; i <= width; i += 40) {
       // X Axis
-      this.cline(i, 5, i, 10, this.styles);
+      this.cline(i, 5, i, 10, this.styles.lds);
       this.context.ctx.fillText(String(i), i - 10, 23);
     }
 
     for (let i = 0; i <= height; i += 40) {
       // y axis
-      this.cline(5, i, 10, i, this.styles);
+      this.cline(5, i, 10, i, this.styles.lds);
       this.context.ctx.fillText(String(i), 13, i + 5);
     }
   }
@@ -324,13 +382,13 @@ class R_Canvas extends CanvasPassAlong {
     // return math.matrix([[c,s,0],[-s,c,0],[0,0,1]]);
   }
 
-  writeo(text: string, pt : Quackable) {
+  writeo(text: string, pt: Quackable) {
     return this.write(text, pt.x, pt.y);
   }
 
   write(text: string, x: number, y: number) {
-    this.context.ctx.font = this.styles.fontStyle;
-    this.context.ctx.fillStyle = this.styles.fillStyle;
+    this.context.ctx.font = this.styles.lds.fontStyle;
+    this.context.ctx.fillStyle = this.styles.lds.fillStyle;
     this.context.ctx.beginPath();
     this.context.ctx.fillText(text, x, y);
     this.context.ctx.closePath();
@@ -339,9 +397,7 @@ class R_Canvas extends CanvasPassAlong {
 
 export {
   R_Canvas,
-  CStyles
-}
-
-export type {
-  StyleType
+  crissCross,
+  lerp2D,
+  getMiddle,middleSmoothing,
 }
